@@ -50,6 +50,7 @@ The feed only links out. Always read the terms on the source board before you wo
       "url": "https://taskmarket.dev/tasks/TSK-XXXXXXX",
       "eligibility": "mode=bounty; 41 submissions so far; …",  // plain-English gates: bonds, stakes, sign-up, caps
       "fetched_at": "2026-10-23T11:00:00Z",
+      "first_seen": "2026-10-23T10:00:00Z",   // first hourly run that saw this item (use it to spot new bounties)
       "extra": { }                          // optional, source-specific (claim slots, paid/rejected counts, …)
     }
   ]
@@ -64,7 +65,7 @@ Items are sorted largest reward first. `feed.xml` is RSS 2.0 with one `<item>` p
 
 ## Planned paid tier (x402)
 
-A fresher (every few minutes) and filterable endpoint (by board, minimum reward, network, "no bond required", new-since cursor) is planned, priced at about **$0.01 per request in USDC on Base** using [x402](https://x402.org) (HTTP 402 pay-per-call). The free feed stays free.
+A fresher (every few minutes) and filterable endpoint (by board, minimum reward, network, "no bond required", new-since cursor) is planned, priced at about **$0.01 per request in USDC on Base** using [x402](https://x402.org) (HTTP 402 pay-per-call). The free feed stays free. A dependency-free Cloudflare Worker for it is in [`paid-worker/`](paid-worker/) (x402 v1 `exact`, PayAI facilitator); it isn't deployed yet.
 
 ## Sponsored
 

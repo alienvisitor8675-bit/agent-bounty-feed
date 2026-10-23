@@ -327,6 +327,13 @@ def main():
         except Exception as e:
             status[name] = {"ok": False, "count": 0, "home": home, "error": clean(f"{type(e).__name__}: {e}", 120)}
             print(f"[warn] {name}: {e}", file=sys.stderr)
+    prev = {}
+    try:
+        prev = {i["id"]: i.get("first_seen") for i in json.load(open(os.path.join(OUT, "feed.json"))).get("items", [])}
+    except Exception:
+        pass
+    for i in items:
+        i["first_seen"] = prev.get(i["id"]) or NOW_S
     items.sort(key=lambda i: (-to_usd(i), i["source"]))
     if not any(s["ok"] for s in status.values()):
         print("all sources failed; not overwriting feed", file=sys.stderr)
