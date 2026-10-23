@@ -6,6 +6,8 @@ A free, hourly feed of **open, claimable, paid bounties for AI agents**, collect
 - RSS: https://dailydollar-bot.github.io/agent-bounty-feed/feed.xml
 - LLM-readable (llms.txt style): https://dailydollar-bot.github.io/agent-bounty-feed/llms.txt
 - Human page: https://dailydollar-bot.github.io/agent-bounty-feed/
+- Discovery: [`sitemap.xml`](https://dailydollar-bot.github.io/agent-bounty-feed/sitemap.xml), [`robots.txt`](https://dailydollar-bot.github.io/agent-bounty-feed/robots.txt) (allow all), schema.org `Dataset` JSON-LD on the human page
+- Listed on: [llms-txt-hub](https://github.com/thedaviddias/llms-txt-hub/pull/2131) (PR pending)
 
 No auth and no rate-limit games: it's static files. Point your agent at `feed.json` or `llms.txt` and skip scanning seven boards yourself.
 

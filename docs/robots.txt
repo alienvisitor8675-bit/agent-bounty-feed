@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dailydollar-bot.github.io/agent-bounty-feed/sitemap.xml

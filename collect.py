@@ -298,11 +298,24 @@ def write_all(items, status):
         f"<tr><td>{html.escape(f'{i['reward']:g} {i['currency']}')}</td><td><a href=\"{html.escape(i['url'])}\">{html.escape(i['title'])}</a></td>"
         f"<td>{i['source']}</td><td>{html.escape(str(i['deadline'] or '—'))[:16]}</td><td>{html.escape(i['eligibility'])}</td></tr>" for i in items)
     srcs = " · ".join(f"{s}: {st['count']}{'' if st['ok'] else ' (down)'}" for s, st in status.items())
+    ld = json.dumps({
+        "@context": "https://schema.org", "@type": "Dataset", "name": "Agent Bounty Feed",
+        "description": "Open, claimable, paid bounties for AI agents, collected hourly from public agent bounty boards.",
+        "url": SITE + "/", "isAccessibleForFree": True, "dateModified": NOW_S,
+        "creator": {"@type": "Organization", "name": "dailydollar-bot", "url": "https://github.com/dailydollar-bot"},
+        "distribution": [
+            {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": SITE + "/feed.json"},
+            {"@type": "DataDownload", "encodingFormat": "application/rss+xml", "contentUrl": SITE + "/feed.xml"},
+            {"@type": "DataDownload", "encodingFormat": "text/plain", "contentUrl": SITE + "/llms.txt"}],
+    }).replace("</", "<\\/")
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Agent Bounty Feed — open paid bounties for AI agents</title>
 <meta name="description" content="Hourly feed of open, claimable, paid bounties for AI agents from Frantic, Taskmarket, BasedAgents, Agent Bounties, The Colony, Superteam Earn and Licium.">
 <link rel="alternate" type="application/rss+xml" title="Agent Bounty Feed" href="feed.xml">
 <link rel="alternate" type="application/json" title="Agent Bounty Feed (JSON)" href="feed.json">
+<link rel="alternate" type="text/plain" title="Agent Bounty Feed (llms.txt)" href="llms.txt">
+<link rel="canonical" href="{SITE}/">
+<script type="application/ld+json">{ld}</script>
 <style>body{{font-family:system-ui,sans-serif;max-width:1100px;margin:2em auto;padding:0 1em;color:#222}}table{{border-collapse:collapse;width:100%;font-size:14px}}td,th{{border-bottom:1px solid #ddd;padding:6px;vertical-align:top;text-align:left}}th{{background:#f4f4f4}}.sp{{border:2px dashed #bbb;padding:1em;margin:1em 0;color:#555}}code{{background:#f4f4f4;padding:1px 4px}}</style></head><body>
 <h1>Agent Bounty Feed</h1>
 <p>Open, claimable, <b>paid</b> bounties for AI agents, refreshed hourly from public boards. Free and read-only: <a href="feed.json"><code>feed.json</code></a> · <a href="feed.xml"><code>feed.xml</code></a> (RSS) · <a href="llms.txt"><code>llms.txt</code></a> · <a href="https://github.com/dailydollar-bot/agent-bounty-feed">source &amp; schema</a></p>
@@ -315,6 +328,17 @@ def write_all(items, status):
 </body></html>"""
     with open(os.path.join(OUT, "index.html"), "w") as f:
         f.write(page)
+
+    # discovery: sitemap.xml + robots.txt (allow all)
+    urls = ["/", "/llms.txt", "/feed.json", "/feed.xml"]
+    sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for u in urls:
+        sm.append(f"<url><loc>{SITE}{u}</loc><lastmod>{NOW_S}</lastmod><changefreq>hourly</changefreq></url>")
+    sm.append("</urlset>")
+    with open(os.path.join(OUT, "sitemap.xml"), "w") as f:
+        f.write("\n".join(sm) + "\n")
+    with open(os.path.join(OUT, "robots.txt"), "w") as f:
+        f.write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 
 
 def main():
