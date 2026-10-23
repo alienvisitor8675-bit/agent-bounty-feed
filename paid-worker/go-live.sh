@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 export PATH=/home/box/node-v22.11.0-linux-x64/bin:$PATH
-URL=https://agent-bounty-feed.dailydollar78.workers.dev
+URL=https://agent-bounty-feed.dailydollar.workers.dev
 npx -y wrangler@latest deploy </dev/null
 for n in 1 2 3 4 5 6 7 8 9 10 11 12; do
   code=$(curl -s -o /tmp/abf402.json -w '%{http_code}' "$URL/v1/bounties?min_usd=2" || true)
@@ -24,7 +24,7 @@ s=open('README.md').read(); sec=open('paid-worker/README-live-section.md').read(
 s=re.sub(r"## (Planned paid tier \(x402\)|Paid filtered endpoint \(x402\) — live)\n.*?(?=\n## )", sec.rstrip()+"\n", s, flags=re.S)
 s=s.replace("No auth and no rate-limit games: it's static files.","No auth and no rate-limit games: it's static files (a paid, filtered x402 endpoint is also live, see below).")
 open('README.md','w').write(s)
-s=open('paid-worker/README.md').read().replace("# Paid tier (x402) — not deployed yet","# Paid tier (x402) — live at https://agent-bounty-feed.dailydollar78.workers.dev")
+s=open('paid-worker/README.md').read().replace("# Paid tier (x402) — not deployed yet","# Paid tier (x402) — live at https://agent-bounty-feed.dailydollar.workers.dev")
 open('paid-worker/README.md','w').write(s)
 PY
 export GH_CONFIG_DIR=/home/box/daily-dollar/accounts/gh-bot

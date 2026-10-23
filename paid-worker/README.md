@@ -1,4 +1,4 @@
-# Paid tier (x402) — not deployed yet
+# Paid tier (x402) — live at https://agent-bounty-feed.dailydollar.workers.dev
 
 `worker.js` is a dependency-free Cloudflare Worker:
 
