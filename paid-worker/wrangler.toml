@@ -1,4 +1,5 @@
 name = "agent-bounty-feed"
+account_id = "763aa25844e19b466190d729709aebbe"
 main = "worker.js"
 compatibility_date = "2026-10-01"
 workers_dev = true

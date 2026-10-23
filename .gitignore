@@ -3,3 +3,5 @@ __pycache__/
 listings/
 PAID-TIER.md
 STATUS.md
+.wrangler/
+node_modules/

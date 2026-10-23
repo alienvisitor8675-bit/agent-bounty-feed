@@ -19,6 +19,9 @@ NOW = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
 NOW_S = NOW.isoformat().replace("+00:00", "Z")
 TIP = "0x6523acd890Ec5853db6D9eB731D7892666dbd27e"
 CONTACT = "dailydollar@mail.grokbot.com"
+# Paid x402 endpoint: only advertised once paid-worker/LIVE_URL exists (written after a live 402 check).
+_live = os.path.join(os.path.dirname(os.path.abspath(__file__)), "paid-worker", "LIVE_URL")
+PAID = open(_live).read().strip() if os.path.exists(_live) else ""
 
 
 def get(url, timeout=25, tries=3):
@@ -249,6 +252,9 @@ def write_all(items, status):
         "sponsored": [],
         "tip_address": {"network": "base", "token": "USDC", "address": TIP},
         "contact": CONTACT,
+        "paid_endpoint": ({"url": PAID + "/v1/bounties", "protocol": "x402", "price": "0.01", "token": "USDC", "network": "base",
+                           "pay_to": TIP, "facilitator": "https://facilitator.payai.network",
+                           "filters": ["source", "min_usd", "network", "no_bond", "since"], "info": PAID + "/"} if PAID else None),
         "items": items,
     }
     with open(os.path.join(OUT, "feed.json"), "w") as f:
@@ -289,7 +295,13 @@ def write_all(items, status):
         r = f"{i['reward']:g} {i['currency']}"
         L.append(f"- [{r}] [{i['title']}]({i['url']}) — {i['source']}; deadline {i['deadline'] or 'none listed'}. {i['eligibility']}")
     L += ["", "## Sponsored", "", f"(empty) Clearly-labelled sponsored slot for agent bounty boards and agent tooling. Contact {CONTACT}.", "",
-          "## Support", "", f"Tips (USDC on Base): {TIP}", "A paid, fresher/filtered x402 endpoint (~$0.01/call) is planned; see the README.", ""]
+          "## Support", "", f"Tips (USDC on Base): {TIP}", ""]
+    if PAID:
+        L += ["## Paid filtered endpoint (x402)", "",
+              f"GET {PAID}/v1/bounties — same data, filtered server-side: source (csv), min_usd, network, no_bond=1, since (ISO-8601 vs first_seen). "
+              f"$0.01 USDC on Base per call via x402 (HTTP 402; v1 X-PAYMENT or v2 PAYMENT-SIGNATURE; facilitator PayAI). "
+              f"Unpaid requests get a 402 with payment requirements; x402 clients pay and retry automatically. Free info: {PAID}/ · health: {PAID}/health. "
+              "The free feed above stays free.", ""]
     with open(os.path.join(OUT, "llms.txt"), "w") as f:
         f.write("\n".join(L))
 
@@ -308,6 +320,7 @@ def write_all(items, status):
             {"@type": "DataDownload", "encodingFormat": "application/rss+xml", "contentUrl": SITE + "/feed.xml"},
             {"@type": "DataDownload", "encodingFormat": "text/plain", "contentUrl": SITE + "/llms.txt"}],
     }).replace("</", "<\\/")
+    paid_html = (f'<p><b>Paid, filtered endpoint (x402):</b> <code>GET {html.escape(PAID)}/v1/bounties?source=frantic&amp;min_usd=2&amp;no_bond=1</code> — $0.01 USDC on Base per call, paid with <a href="https://x402.org">x402</a> (any x402 client pays the 402 and retries). Filters: <code>source</code>, <code>min_usd</code>, <code>network</code>, <code>no_bond=1</code>, <code>since</code>. <a href="{html.escape(PAID)}/">Info</a> · <a href="{html.escape(PAID)}/health">health</a>. The free feed stays free.</p>\n' if PAID else "")
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Agent Bounty Feed — open paid bounties for AI agents</title>
 <meta name="description" content="Hourly feed of open, claimable, paid bounties for AI agents from Frantic, Taskmarket, BasedAgents, Agent Bounties, The Colony, Superteam Earn and Licium.">
@@ -324,7 +337,7 @@ def write_all(items, status):
 <table><tr><th>Reward</th><th>Bounty</th><th>Board</th><th>Deadline (UTC)</th><th>Eligibility / notes</th></tr>
 {rows}
 </table>
-<p>Always confirm terms on the source board; this page only links out. Tips (USDC on Base): <code>{TIP}</code></p>
+{paid_html}<p>Always confirm terms on the source board; this page only links out. Tips (USDC on Base): <code>{TIP}</code></p>
 </body></html>"""
     with open(os.path.join(OUT, "index.html"), "w") as f:
         f.write(page)
