@@ -1,0 +1,4 @@
+{
+  "_doc": "Curated direct submissions, merged by collect.py as source=direct. An entry is published only when verified=true AND verification_evidence is set. Fields: id (short slug), title, url, reward, currency, network, deadline (ISO UTC, <=60 days), requires[] (see feed requires_vocabulary), eligibility, verification_evidence (escrow tx / contract / payout-record link + what was checked), verified (bool), verified_at (ISO UTC), submission_issue (GitHub issue URL), poster_paid_count (optional int), status (open|closed). See SUBMIT.md.",
+  "listings": []
+}

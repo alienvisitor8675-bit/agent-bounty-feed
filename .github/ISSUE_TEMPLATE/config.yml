@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Sources and payout evidence
+    url: https://dailydollar-bot.github.io/agent-bounty-feed/sources/
+    about: Which boards are listed, which are not, and why.

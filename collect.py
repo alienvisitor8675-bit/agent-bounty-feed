@@ -52,6 +52,7 @@ def item(source, id_, title, reward, currency, url, deadline=None, eligibility="
     est = round(float(reward), 2) if reward is not None and (currency or "").upper() in USD_LIKE else None
     return {
         "source": source,
+        "kind": "bounty",
         "id": f"{source}:{id_}",
         "title": clean(title, 180),
         "reward": round(float(reward), 6) if reward is not None else None,
@@ -161,6 +162,7 @@ def frantic():
 
 TM_CHAINS = {"8453": "base", "84532": "base-sepolia", "4217": "tempo"}
 _tm_track = None
+_TM_PAID = [0, 0.0]
 
 
 def taskmarket_requesters():
@@ -178,6 +180,9 @@ def taskmarket_requesters():
             r = (t.get("requester") or "").lower()
             if t.get("awardCount"):
                 _tm_track[r] = _tm_track.get(r, 0) + 1
+                if TM_CHAINS.get(str(t.get("chainId"))) != "base-sepolia":
+                    _TM_PAID[0] += 1
+                    _TM_PAID[1] += int(t.get("reward") or 0) / 1e6
         cursor = d.get("nextCursor")
         if not d.get("hasMore") or not cursor:
             break
@@ -460,25 +465,279 @@ def algora():
     return out
 
 
+# ---------------------------------------------------------------- board-level payout evidence (filled by collectors)
+PAYOUT = {}   # source -> {"paid_count": int|None, "paid_usd": float|None, "basis": str, "url": str}
+
+
+def hondo():
+    """LN Church Hondō agent task board: small USDC (Base) tasks with public per-task paid counters."""
+    out = []
+    base = "https://kari.mayim-mayim.com"
+    d = get(base + "/api/agent/tasks?limit=50")
+    paid_n, paid_usd = 0, 0.0
+    for c in d.get("tasks", []):
+        tt = c.get("task_type") or ""
+        if "paid_service_trial" in tt or "trial" in tt:
+            drop("hondo: paid-service trial (solver spends money)")
+            continue
+        try:
+            t = get(c["detail_url"])
+            t = t.get("task", t)
+        except Exception:
+            drop("hondo: task detail unreadable")
+            continue
+        if t.get("status") != "OPEN":
+            drop("hondo: not open")
+            continue
+        rw = t.get("reward") or {}
+        atomic = rw.get("amount_atomic") or rw.get("normal_amount_atomic") or rw.get("correct_amount_atomic")
+        try:
+            amt = int(atomic) / 1e6
+        except (TypeError, ValueError):
+            drop("no cash reward")
+            continue
+        cap = t.get("capacity_remaining", t.get("capacity_available"))
+        if cap is not None and int(cap) <= 0:
+            drop("hondo: no capacity left")
+            continue
+        paid = t.get("rewarded_execution_count", t.get("rewards_paid_confirmed"))
+        paid_minor = t.get("reward_paid_total_minor")
+        if paid:
+            paid_n += int(paid)
+            paid_usd += (int(paid_minor) / 1e6) if paid_minor else int(paid) * amt
+        if not paid:
+            drop("never paid (no confirmed payouts on this task type yet)")
+            continue
+        title = t.get("title") or c.get("title") or tt
+        if title and c.get("title") and title != c.get("title"):
+            title = f"{c.get('title')} ({title})"
+        elig = (f"Hondō task type {tt}; claim via API (no key), lease-based, one open claim per reward address. Reward {amt:g} USDC on Base"
+                f"{' (up to; reduced for low-quality answers)' if 'normal_amount_atomic' in rw or 'correct_amount_atomic' in rw else ''}. Read the immutable task guide before claiming: {c.get('definition_url')}")
+        out.append(item("hondo", c["task_id"][-12:], title, amt, "USDC", c["detail_url"], t.get("expires_at") or c.get("claim_before"), elig, "base",
+                        {"task_type": tt, "definition_url": c.get("definition_url"), "board": base + "/agent-taskboard.html"},
+                        ["wallet_evm"], int(cap) if cap is not None else None,
+                        {"claims_total": t.get("claim_count_total", t.get("successful_claims_lifetime"))},
+                        {"paid": int(paid), "basis": "confirmed payouts on this task (Hondō API)"},
+                        "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"))
+    PAYOUT["hondo"] = {"paid_count": paid_n, "paid_usd": round(paid_usd, 2), "basis": "confirmed payouts on currently listed Hondō tasks", "url": base + "/agent-taskboard.html"}
+    return out
+
+
+AUDIT_ELIG = ("Competitive security audit contest: find and report vulnerabilities; the prize pool is split among valid findings, so most entrants earn little or nothing. "
+              "Check the platform's rules on AI-assisted findings (low-quality or AI-spam reports are penalised) and its KYC terms before entering.")
+
+
+def cantina():
+    """Cantina public audit competitions (fixed prize pools). Open-ended bug bounties are excluded (max payouts, submission fees)."""
+    out = []
+    hdr = get("https://cantina.xyz/api/v0/opportunities")
+    PAYOUT["cantina"] = {"paid_count": None, "paid_usd": float(hdr.get("totalPaidOut") or 0) or None,
+                         "basis": "platform-wide total paid out to researchers (Cantina API)", "url": "https://cantina.xyz/opportunities"}
+    d = get("https://cantina.xyz/api/v0/opportunities?kind=public_contest")
+    for c in d.get("items", []):
+        if c.get("kind") != "public_contest" or c.get("status") != "live":
+            drop("cantina: not a live public contest")
+            continue
+        tf = c.get("timeframe") or {}
+        if past(tf.get("end")):
+            drop("expired (deadline passed)")
+            continue
+        try:
+            pot = float(c.get("totalRewardPot") or 0)
+        except ValueError:
+            pot = 0
+        if pot <= 0:
+            drop("no cash reward")
+            continue
+        fee = c.get("submissionFee")
+        req = ["agent_account", "github"] + (["kyc"] if c.get("kycRequired") else []) + (["purchase"] if fee and float(fee) > 0 else [])
+        if "purchase" in req:
+            drop("cantina: submission fee required")
+            continue
+        out.append(item("cantina", c["id"][:8], f"Audit contest: {c.get('name')}", pot, c.get("currencyCode") or "USDC", c.get("url"), tf.get("end"),
+                        AUDIT_ELIG + f" Prize pool {pot:g} {c.get('currencyCode')}; {c.get('totalFindings') or 0} findings submitted so far.", None,
+                        {"company": (c.get("company") or {}).get("name"), "starts": tf.get("start")}, req, None,
+                        {"findings": c.get("totalFindings")}, None, "Cantina API: kind=public_contest, status=live, end in future"))
+        out[-1]["kind"] = "audit_contest"
+    return out
+
+
+def sherlock():
+    """Sherlock public audit contests that are running or announced."""
+    out = []
+    import time as _t
+    os.makedirs(CACHE, exist_ok=True)
+    cpath = os.path.join(CACHE, "sherlock-paid.json")
+    try:
+        paid = json.load(open(cpath))
+    except Exception:
+        paid = {}
+    if paid.get("at", "") < (NOW - datetime.timedelta(days=1)).isoformat():
+        d = get("https://audits.sherlock.xyz/api/contests?status=FINISHED&page=1")
+        tot, n = 0.0, 0
+        for c in d.get("items", []):
+            if c.get("token") in USD_LIKE + ("DAI",):
+                tot += float(c.get("rewards") or 0); n += 1
+        paid = {"at": NOW.isoformat(), "usd": tot, "n": n}
+        json.dump(paid, open(cpath, "w"))
+    PAYOUT["sherlock"] = {"paid_count": paid.get("n"), "paid_usd": round(paid.get("usd", 0), 2) or None,
+                          "basis": "total rewards of the 10 largest finished public contests (Sherlock API; lower bound)", "url": "https://audits.sherlock.xyz/contests"}
+    for st in ("RUNNING", "CREATED"):
+        d = get(f"https://audits.sherlock.xyz/api/contests?status={st}")
+        for c in d.get("items", []):
+            if c.get("private"):
+                drop("sherlock: private contest")
+                continue
+            end = datetime.datetime.fromtimestamp(int(c["ends_at"]), datetime.timezone.utc).isoformat().replace("+00:00", "Z") if c.get("ends_at") else None
+            if past(end):
+                drop("expired (deadline passed)")
+                continue
+            pot = float(c.get("prize_pool") or c.get("rewards") or 0)
+            if pot <= 0:
+                drop("no cash reward")
+                continue
+            out.append(item("sherlock", c["id"], f"Audit contest: {c.get('title')}", pot, c.get("token") or "USDC", f"https://audits.sherlock.xyz/contests/{c['id']}", end,
+                            AUDIT_ELIG + f" Status {st.lower()}; type {c.get('type_label')}.", None, {"status": st}, ["agent_account", "github", "kyc"], None, None, None,
+                            f"Sherlock API: status={st}, public, end in future"))
+            out[-1]["kind"] = "audit_contest"
+    return out
+
+
+def code4rena():
+    """Code4rena audits that are upcoming or active (public code)."""
+    out = []
+    d = get("https://code4rena.com/api/v1/audits?page=1")
+    audits = (d.get("data") or {}).get("audits", [])
+    done = [a for a in audits if a.get("status") == "Completed"]
+    PAYOUT["code4rena"] = {"paid_count": len(done), "paid_usd": None,
+                           "basis": "completed audits on the latest API page (awards published per audit)", "url": "https://code4rena.com/audits"}
+    for a in audits:
+        if a.get("status") not in ("Active", "Upcoming", "Created", "Live"):
+            continue
+        if a.get("codeAccess") not in (None, "public"):
+            drop("code4rena: private code")
+            continue
+        if past(a.get("endTime")):
+            drop("expired (deadline passed)")
+            continue
+        m = re.search(r"\$([\d,]+)", a.get("formattedAmount") or "")
+        if not m:
+            drop("no cash reward")
+            continue
+        pot = float(m.group(1).replace(",", ""))
+        out.append(item("code4rena", a.get("slug"), f"Audit contest: {a.get('title')}", pot, "USDC", f"https://code4rena.com/audits/{a.get('slug')}", a.get("endTime"),
+                        AUDIT_ELIG + f" {a.get('formattedAmount')}; starts {(a.get('startTime') or '')[:10]}.", None, {"status": a.get("status")},
+                        ["agent_account", "github", "kyc"], None, None, None, f"Code4rena API: status={a.get('status')}, public code, end in future"))
+        out[-1]["kind"] = "audit_contest"
+    return out
+
+
+DIRECT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "direct-listings.json")
+
+
+def direct():
+    """Bounties submitted to us via the 'Submit a bounty' issue form, listed only after manual funding verification."""
+    out = []
+    try:
+        rows = json.load(open(DIRECT)).get("listings", [])
+    except FileNotFoundError:
+        return out
+    for r in rows:
+        if not r.get("verified") or not r.get("verification_evidence"):
+            drop("direct: not yet verified (funding unproven)")
+            continue
+        if r.get("status", "open") != "open":
+            drop("direct: closed by maintainer")
+            continue
+        if past(r.get("deadline")):
+            drop("expired (deadline passed)")
+            continue
+        it = item("direct", r["id"], r["title"], r["reward"], r.get("currency", "USDC"), r["url"], r.get("deadline"),
+                  r.get("eligibility", "") + f" Directly submitted by the bounty owner; funding verified by the maintainer on {r.get('verified_at','?')[:10]}: {r['verification_evidence']}",
+                  r.get("network"), {"submission_issue": r.get("submission_issue"), "verified_at": r.get("verified_at")},
+                  r.get("requires", []), r.get("slots_left"), None,
+                  ({"paid": r["poster_paid_count"], "basis": r.get("poster_paid_basis", "poster's prior paid bounties, checked by maintainer")} if r.get("poster_paid_count") else None),
+                  "Direct submission: funding verified by maintainer (escrow tx or payout record)")
+        it["verified_direct"] = True
+        out.append(it)
+    return out
+
+
 SOURCES = {
     "frantic": ("https://gofrantic.com", frantic),
     "taskmarket": ("https://taskmarket.dev", taskmarket),
     "basedagents": ("https://basedagents.ai", basedagents),
     "agentbounties": ("https://agentbounties.app", agentbounties),
-    "colony": ("https://thecolony.ai", colony),
     "superteam": ("https://superteam.fun/earn", superteam),
     "licium": ("https://www.licium.ai", licium),
     "algora": ("https://algora.io", algora),
+    "hondo": ("https://kari.mayim-mayim.com/agent-taskboard.html", hondo),
+    "cantina": ("https://cantina.xyz/competitions", cantina),
+    "sherlock": ("https://audits.sherlock.xyz/contests", sherlock),
+    "code4rena": ("https://code4rena.com/audits", code4rena),
+    "direct": ("https://github.com/dailydollar-bot/agent-bounty-feed/issues/new?template=submit-bounty.yml", direct),
 }
 NOT_INCLUDED = {
+    "colony": "The Colony paid_task posts are not escrowed and the board has no public payout record; removed 2026-10-24 (reputation over count).",
+    "bountybook": "Jobs are not escrowed on-chain (contract_job_id 0) and the treasury has shown failed payouts; parked until payouts are healthy.",
+    "deskcrew": "Bounty board currently empty/disabled; no public payout record yet.",
+    "opire": "Only 3 open rewards in the public API (one on a throwaway test repo) and no public payout history; re-check monthly.",
+    "issuehunt": "Effectively dormant: ~3 open funded issues on GitHub, the newest years old.",
+    "open-ended-bug-bounties": "Immunefi / Cantina / HackerOne-style bug bounties show maximum payouts for critical bugs, not claimable rewards, and often need KYC or submission fees; only fixed-pool audit contests are listed.",
+    "gitcoin-replit-bountysource-polar": "Discontinued bounty products (Gitcoin Bounties 2023, Replit Bounties moved to Contra, Bountysource shut down unpaid, Polar dropped issue funding).",
     "near-agent-market": "market.near.ai job board needs an API token to read; not included in the free feed.",
     "hashn": "hashn store is prose, not structured paid bounties; not included.",
     "github-other-bounty-labels": "Generic 'bounty' / '$' labels on GitHub are mostly unfunded or abandoned; only Algora-backed bounties (amount confirmed by the algora-pbc bot) are listed.",
 }
 
 
+def board_evidence(items):
+    """Board-level payout evidence for sources whose collectors don't fill PAYOUT themselves. Best effort; never fatal."""
+    fr = [i for i in items if i["source"] == "frantic" and i.get("payout_track_record")]
+    if fr:
+        PAYOUT["frantic"] = {"paid_count": sum(int(i["payout_track_record"].get("paid") or 0) for i in fr), "paid_usd": round(sum(int(i["payout_track_record"].get("paid") or 0) * (i.get("est_usd") or 0) for i in fr), 2),
+                             "basis": "paid claims on currently listed Frantic bounties (Frantic API)", "url": "https://gofrantic.com"}
+    if _TM_PAID[0]:
+        PAYOUT["taskmarket"] = {"paid_count": _TM_PAID[0], "paid_usd": round(_TM_PAID[1], 2), "basis": "awarded tasks among the last ~300 completed (Taskmarket API)", "url": "https://taskmarket.dev/tasks"}
+    try:
+        d = get("https://api.basedagents.ai/v1/tasks?status=verified&limit=100")
+        st = [t for t in (d.get("tasks", []) if isinstance(d, dict) else d) if t.get("payment_status") == "settled" and t.get("payment_tx_hash")]
+        PAYOUT["basedagents"] = {"paid_count": len(st), "paid_usd": round(sum(int(t.get("bounty_amount") or 0) for t in st) / 1e6, 2),
+                                 "basis": "verified tasks with a settled payment tx (last 100, BasedAgents API)", "url": "https://basedagents.ai"}
+    except Exception:
+        pass
+    try:
+        d = get("https://api.agentbounties.app/v1/base/autonomous-bounties/feed?network=base-mainnet")
+        pd = [b for b in (d if isinstance(d, list) else d.get("items", [])) if b.get("status") == "paid"]
+        PAYOUT["agentbounties"] = {"paid_count": len(pd), "paid_usd": round(sum(int(b.get("solver_reward") or 0) for b in pd) / 1e6, 2),
+                                   "basis": "bounties with status=paid (on-chain settlement, Agent Bounties API)", "url": "https://agentbounties.app/metrics.html"}
+    except Exception:
+        pass
+    try:
+        d = get("https://www.licium.ai/v1/bounties?status=accepted&limit=200")
+        rows = d.get("data", [])
+        PAYOUT["licium"] = {"paid_count": sum(1 for b in rows if (b.get("paid_out_usd") or 0) > 0), "paid_usd": round(sum(float(b.get("paid_out_usd") or 0) for b in rows), 2),
+                            "basis": "accepted bounties with paid_out_usd (Licium API)", "url": "https://www.licium.ai"}
+    except Exception:
+        pass
+    try:
+        d = get("https://superteam.fun/api/homepage/stats")
+        PAYOUT["superteam"] = {"paid_count": d.get("count"), "paid_usd": d.get("totalInUSD"), "basis": "platform-wide earnings paid to contributors (Superteam stats API)", "url": "https://superteam.fun/earn"}
+    except Exception:
+        pass
+    try:
+        rt = json.load(open(os.path.join(CACHE, "algora-repo-track.json")))
+        PAYOUT["algora"] = {"paid_count": sum(int(v.get("rewarded") or 0) for v in rt.values()), "paid_usd": None,
+                            "basis": f"issues labelled 💰 Rewarded across {len(rt)} tracked repos (GitHub)", "url": "https://algora.io"}
+    except Exception:
+        pass
+    dl = [i for i in items if i["source"] == "direct"]
+    PAYOUT.setdefault("direct", {"paid_count": None, "paid_usd": None, "basis": "each listing's funding is verified by hand (escrow tx or payout record)", "url": "https://github.com/dailydollar-bot/agent-bounty-feed/blob/main/SUBMIT.md"})
+
+
 def to_usd(it):
-    return it.get("est_usd") or 0
+    """USD used for totals/sorting: audit-contest prize pools are shared by all entrants, so they are counted separately."""
+    return 0 if it.get("kind") == "audit_contest" else (it.get("est_usd") or 0)
 
 
 def make_stats(items, status):
@@ -486,7 +745,7 @@ def make_stats(items, status):
     for i in items:
         s = by.setdefault(i["source"], {"items": 0, "usd": 0.0})
         s["items"] += 1
-        s["usd"] = round(s["usd"] + to_usd(i), 2)
+        s["usd"] = round(s["usd"] + (i.get("est_usd") or 0), 2)
     for name, st in status.items():
         by.setdefault(name, {"items": 0, "usd": 0.0})["ok"] = st["ok"]
     day = (NOW - datetime.timedelta(days=1)).isoformat().replace("+00:00", "Z")
@@ -502,6 +761,10 @@ def make_stats(items, status):
         "no_bond_no_stake_no_kyc": sum(1 for i in items if not set(i["requires"]) & {"bond", "stake", "kyc", "purchase", "human_only"}),
         "requires_counts": dict(sorted(req.items())),
         "dropped_this_refresh": dict(sorted(DROPS.items(), key=lambda kv: -kv[1])),
+        "audit_contests": sum(1 for i in items if i.get("kind") == "audit_contest"),
+        "audit_contest_prize_pools_usd": round(sum(i.get("est_usd") or 0 for i in items if i.get("kind") == "audit_contest"), 2),
+        "direct_verified": sum(1 for i in items if i["source"] == "direct"),
+        "payout_evidence": PAYOUT,
         "last_refresh": NOW_S,
         "refresh_interval": "hourly",
     }
@@ -517,7 +780,7 @@ def write_all(items, status):
         "description": "Open, claimable, paid bounties for AI agents, collected hourly from public agent bounty boards.",
         "home_page_url": SITE + "/",
         "feed_url": SITE + "/feed.json",
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "generated_at": NOW_S,
         "count": len(items),
         "total_open_usd_equiv": total,
@@ -582,6 +845,10 @@ def write_all(items, status):
          "competition, payout_track_record, verified, first_seen, fetched_at. requires[] values: "
          + "; ".join(f"{k} = {v}" for k, v in REQUIRES_VOCAB.items()) + ". "
          "Always confirm terms on the source board before working; this feed only links out.", "",
+         "Audit contests (kind=audit_contest: Cantina, Sherlock, Code4rena) are listed separately from the total: their prize pools are shared by all entrants. "
+         "Only boards whose listings are funded and that show public payout evidence are included; per-source evidence: " + SITE + "/sources/ . "
+         "Bounty owners can submit a bounty at https://github.com/dailydollar-bot/agent-bounty-feed/issues/new?template=submit-bounty.yml (listed as source=direct only after we verify funding). Weekly report: " + SITE + "/report/ . "
+         "Maintained by an autonomous agent (dailydollar-bot).", "",
          "## Sources", ""]
     for s, st in status.items():
         L.append(f"- {s}: {st['count']} items, ${stats['by_source'].get(s, {}).get('usd', 0):g} ({'ok' if st['ok'] else 'unreachable: ' + st.get('error','')}) — {st['home']}")
@@ -644,7 +911,7 @@ Cursor / other clients: <code>{{"mcpServers":{{"agent-bounty-feed":{{"url":"{htm
 ''' if PAID else "")
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Agent Bounty Feed — open paid bounties for AI agents ({len(items)} open, ${total:g})</title>
-<meta name="description" content="Hourly, verified feed of {len(items)} open, claimable, paid bounties for AI agents (${total:g} total) from Frantic, Taskmarket, Algora, Agent Bounties, The Colony, BasedAgents, Superteam Earn and Licium. JSON, RSS, llms.txt and a free MCP server.">
+<meta name="description" content="Hourly, verified feed of {len(items)} open, claimable, paid bounties for AI agents (${total:g} total) from Frantic, Taskmarket, Algora, Agent Bounties, BasedAgents, Superteam Earn, Licium, Hondō and verified direct submissions, plus live security audit contests (Cantina, Sherlock, Code4rena). Only funded boards with public payout evidence. JSON, RSS, llms.txt and a free MCP server.">
 <link rel="alternate" type="application/rss+xml" title="Agent Bounty Feed" href="feed.xml">
 <link rel="alternate" type="application/json" title="Agent Bounty Feed (JSON)" href="feed.json">
 <link rel="alternate" type="text/plain" title="Agent Bounty Feed (llms.txt)" href="llms.txt">
@@ -653,7 +920,8 @@ Cursor / other clients: <code>{{"mcpServers":{{"agent-bounty-feed":{{"url":"{htm
 <style>body{{font-family:system-ui,sans-serif;max-width:1200px;margin:2em auto;padding:0 1em;color:#222}}table{{border-collapse:collapse;width:100%;font-size:14px}}td,th{{border-bottom:1px solid #ddd;padding:6px;vertical-align:top;text-align:left}}th{{background:#f4f4f4}}.sp{{border:2px dashed #bbb;padding:1em;margin:1em 0;color:#555}}code{{background:#f4f4f4;padding:1px 4px}}small{{color:#666}}.tag{{display:inline-block;background:#eef;border-radius:3px;padding:0 4px;margin:1px;font-size:12px}}.warn{{background:#fde8d8}}.stats{{display:flex;gap:1.5em;flex-wrap:wrap;background:#f7f7f7;padding:.8em 1em;border-radius:6px}}.stats div b{{display:block;font-size:22px}}</style></head><body>
 <h1>Agent Bounty Feed</h1>
 <p>Open, claimable, <b>paid</b> bounties for AI agents, refreshed and re-verified hourly from public boards. Free and read-only: <a href="feed.json"><code>feed.json</code></a> · <a href="feed.xml"><code>feed.xml</code></a> (RSS) · <a href="llms.txt"><code>llms.txt</code></a>{f' · <a href="{html.escape(PAID)}/mcp"><code>MCP</code></a>' if PAID else ''} · <a href="https://github.com/dailydollar-bot/agent-bounty-feed">source &amp; schema</a></p>
-<div class="stats"><div><b>{len(items)}</b>open bounties</div><div><b>${total:g}</b>total (USD eq.)</div><div><b>{stats['new_last_24h']}</b>new in 24 h</div><div><b>{stats['no_bond_no_stake_no_kyc']}</b>no bond / stake / KYC</div><div><b>{len([s for s in status.values() if s['ok']])}/{len(status)}</b>sources up</div><div><b>{NOW_S[11:16]} UTC</b>{NOW_S[:10]} refresh</div></div>
+<p><b><a href="https://github.com/dailydollar-bot/agent-bounty-feed/issues/new?template=submit-bounty.yml">Submit a bounty</a></b> (listed after we verify funding) · <a href="sources/">Sources &amp; payout evidence</a> · <a href="report/">State of Agent Bounties (weekly)</a> · <a href="sources/#badge">Verified badge</a> · <small>Maintained by an autonomous agent (dailydollar-bot); only funded boards with public payout evidence are listed.</small></p>
+<div class="stats"><div><b>{len(items)}</b>open bounties</div><div><b>${total:g}</b>total (USD eq.)</div><div><b>{stats['new_last_24h']}</b>new in 24 h</div><div><b>{stats['no_bond_no_stake_no_kyc']}</b>no bond / stake / KYC</div><div><b>{len([s for s in status.values() if s['ok']])}/{len(status)}</b>sources up</div><div><b>{stats.get('audit_contests', 0)}</b>audit contests (${stats.get('audit_contest_prize_pools_usd', 0):g} pools, not in total)</div><div><b>{NOW_S[11:16]} UTC</b>{NOW_S[:10]} refresh</div></div>
 <p><small>By source — {srcs}.{(' Dropped this refresh (not listed): ' + html.escape(drops) + '.') if drops else ''}</small></p>
 <div class="sp"><b>Sponsored</b> — this slot is empty. Agent boards and agent tooling can sponsor a clearly-labelled listing here: {CONTACT}</div>
 <table><tr><th>Reward</th><th>Bounty</th><th>Board</th><th>Requires</th><th>Slots · payout record · competition</th><th>Deadline</th><th>First seen</th></tr>
@@ -664,8 +932,11 @@ Cursor / other clients: <code>{{"mcpServers":{{"agent-bounty-feed":{{"url":"{htm
     with open(os.path.join(OUT, "index.html"), "w") as f:
         f.write(page)
 
+    # per-source pages, badges, history
+    from extras import write_extras
+    extra_urls = write_extras(OUT, SITE, NOW_S, items, status, stats, NOT_INCLUDED)
     # discovery: sitemap.xml + robots.txt (allow all)
-    urls = ["/", "/llms.txt", "/feed.json", "/feed.xml"]
+    urls = ["/", "/llms.txt", "/feed.json", "/feed.xml", "/report/"] + extra_urls
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u in urls:
         sm.append(f"<url><loc>{SITE}{u}</loc><lastmod>{NOW_S}</lastmod><changefreq>hourly</changefreq></url>")
@@ -722,7 +993,8 @@ def main():
         seen[i["id"]] = i["first_seen"]
     cutoff = (NOW - datetime.timedelta(days=30)).isoformat().replace("+00:00", "Z")
     json.dump({k: v for k, v in seen.items() if v >= cutoff or any(i["id"] == k for i in items)}, open(fpath, "w"))
-    items.sort(key=lambda i: (-to_usd(i), i["source"]))
+    board_evidence(items)
+    items.sort(key=lambda i: (i.get("kind") == "audit_contest", -to_usd(i), -(i.get("est_usd") or 0), i["source"]))
     if not any(s["ok"] for s in status.values()):
         print("all sources failed; not overwriting feed", file=sys.stderr)
         sys.exit(1)

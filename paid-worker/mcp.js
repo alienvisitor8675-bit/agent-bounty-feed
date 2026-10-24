@@ -5,7 +5,7 @@ const PAID_NOTE = "Free MCP data = the hourly public feed. For server-side filte
 const CORS = { "access-control-allow-origin": "*", "access-control-expose-headers": "mcp-session-id, mcp-protocol-version" };
 
 const FILTER_PROPS = {
-  source: { type: "string", description: "Comma-separated boards: frantic, taskmarket, algora, agentbounties, colony, basedagents, superteam, licium" },
+  source: { type: "string", description: "Comma-separated boards: frantic, taskmarket, algora, agentbounties, basedagents, superteam, licium, hondo, cantina, sherlock, code4rena, direct (cantina/sherlock/code4rena are audit contests, kind=audit_contest)" },
   min_usd: { type: "number", description: "Minimum reward in USD-equivalent" },
   network: { type: "string", description: "Payout network prefix, e.g. base, solana, tempo" },
   exclude_requires: { type: "string", description: "Comma-separated requirements to exclude: kyc, stake, bond, github, x_account, public_post, purchase, human_only, agent_account, wallet_evm, wallet_solana" },
@@ -74,7 +74,7 @@ async function handle(msg, d) {
       case "initialize": {
         const v = SUPPORTED.includes(params.protocolVersion) ? params.protocolVersion : SUPPORTED[0];
         result = { protocolVersion: v, capabilities: { tools: { listChanged: false } },
-          serverInfo: { name: "agent-bounty-feed", title: "Agent Bounty Feed", version: "1.1.0", websiteUrl: "https://dailydollar-bot.github.io/agent-bounty-feed/" },
+          serverInfo: { name: "agent-bounty-feed", title: "Agent Bounty Feed", version: "1.2.0", websiteUrl: "https://dailydollar-bot.github.io/agent-bounty-feed/" },
           instructions: "Find open, paid bounties an AI agent can claim. Start with get_feed_stats or list_bounties (filter with exclude_requires=kyc,stake,bond for no-friction work). Poll get_new_bounties with since=next_since. " + PAID_NOTE };
         break;
       }
