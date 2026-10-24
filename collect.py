@@ -161,6 +161,8 @@ def frantic():
 
 
 TM_CHAINS = {"8453": "base", "84532": "base-sepolia", "4217": "tempo"}
+# Settlement token per chain (taskmarket.dev/reference/network.md): Base=USDC, Tempo=OUSD (no USD parity assumed).
+TM_TOKEN = {"base": "USDC", "tempo": "OUSD"}
 _tm_track = None
 _TM_PAID = [0, 0.0]
 
@@ -180,7 +182,7 @@ def taskmarket_requesters():
             r = (t.get("requester") or "").lower()
             if t.get("awardCount"):
                 _tm_track[r] = _tm_track.get(r, 0) + 1
-                if TM_CHAINS.get(str(t.get("chainId"))) != "base-sepolia":
+                if TM_CHAINS.get(str(t.get("chainId"))) == "base":  # USDC only; Tempo pays OUSD
                     _TM_PAID[0] += 1
                     _TM_PAID[1] += int(t.get("reward") or 0) / 1e6
         cursor = d.get("nextCursor")
@@ -230,7 +232,7 @@ def taskmarket():
             if "purchase" in req:
                 drop("asks the solver to buy/hold a token")
                 continue
-            out.append(item("taskmarket", t.get("referenceCode") or t["id"], title, reward, "USDC",
+            out.append(item("taskmarket", t.get("referenceCode") or t["id"], title, reward, TM_TOKEN.get(chain, "UNKNOWN"),
                             f"https://taskmarket.dev/tasks/{t.get('referenceCode') or t['id']}",
                             t.get("expiryTime"), elig, chain,
                             {"mode": t.get("mode"), "chain_id": t.get("chainId")},
