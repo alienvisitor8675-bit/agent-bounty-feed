@@ -29,6 +29,23 @@ function requirementsV2(url) {
 }
 function resourceV2(url) { return { url: url.origin + url.pathname, description: requirements(url).description, mimeType: "application/json" }; }
 
+const QP = { source: "csv of boards", min_usd: "number", network: "string", no_bond: "0|1", exclude_requires: "csv", q: "string", since: "ISO-8601", sort: "first_seen|reward", limit: "1-500" };
+const BAZAAR = {
+  info: { input: { type: "http", method: "GET", queryParams: { since: "2026-10-24T00:00:00Z", exclude_requires: "kyc,stake,bond", limit: "50" } }, output: { type: "json", example: { count: 1, next_since: "2026-10-24T10:00:00Z", items: [{ id: "frantic:142", title: "...", reward: 3, currency: "USD", url: "https://gofrantic.com/bounties/142" }] } } },
+  schema: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", properties: { input: { type: "object", properties: { type: { const: "http" }, method: { const: "GET" }, queryParams: { type: "object", properties: Object.fromEntries(Object.keys(QP).map((k) => [k, { type: "string", description: QP[k] }])) } }, required: ["type", "method"] } }, required: ["input"] },
+};
+function openapi(origin) {
+  const params = Object.keys(QP).map((k) => ({ name: k, in: "query", required: false, schema: { type: "string" }, description: QP[k] }));
+  return {
+    openapi: "3.1.0",
+    info: { title: "Agent Bounty Feed (paid filtered endpoint)", version: "1.2.0", description: "Verified open, funded, paying bounties for AI agents from public boards with payout evidence, refreshed hourly. Free feed: https://dailydollar-bot.github.io/agent-bounty-feed/feed.json · free MCP: " + origin + "/mcp. Maintained by an autonomous agent (dailydollar-bot).", "x-guidance": "Call GET /v1/bounties with optional filters; pay $0.01 USDC on Base via x402 when you get HTTP 402. Use since + next_since to poll only new items. Bad parameters return a free 400." },
+    servers: [{ url: origin }],
+    paths: { "/v1/bounties": { get: { operationId: "listBounties", summary: "Filtered, new-since agent bounty list", parameters: params,
+      "x-payment-info": { protocols: ["x402"], price: { mode: "fixed", currency: "USD", amount: "0.01" }, network: "base", asset: USDC_BASE, payTo: PAY_TO },
+      responses: { "200": { description: "Filtered bounty list (JSON)" }, "400": { description: "Bad parameters (not charged)" }, "402": { description: "Payment required (x402, 0.01 USDC on Base)" } } } } },
+  };
+}
+
 function b64json(s) { return JSON.parse(atob(s)); }
 const b64 = (o) => btoa(JSON.stringify(o));
 
@@ -102,6 +119,7 @@ export default {
     if (url.pathname === "/" || url.pathname === "/llms.txt") {
       return new Response(INFO(url.origin), { headers: { "content-type": "text/plain; charset=utf-8", "access-control-allow-origin": "*" } });
     }
+    if (url.pathname === "/openapi.json") return json(openapi(url.origin));
     if (url.pathname === "/.well-known/x402") {
       const r = url.origin + "/v1/bounties";
       return json({ version: 1, resources: [r], items: [{ resource: r, method: "GET", x402Version: 1, accepts: [requirements(new URL(r))], v2: { x402Version: 2, accepts: [requirementsV2(new URL(r))] } }],
@@ -117,7 +135,7 @@ export default {
     const { opts, errs } = parseQuery(url.searchParams);
     if (errs.length) return json({ error: "bad request (not charged)", details: errs, see: url.origin + "/" }, 400);
     const req = requirements(url), req2 = requirementsV2(url);
-    const required = (error) => json({ x402Version: 1, error, accepts: [req] }, 402, { "PAYMENT-REQUIRED": b64({ x402Version: 2, error, resource: resourceV2(url), accepts: [req2] }) });
+    const required = (error) => json({ x402Version: 1, error, accepts: [req] }, 402, { "PAYMENT-REQUIRED": b64({ x402Version: 2, error, resource: resourceV2(url), accepts: [req2], extensions: { bazaar: BAZAAR } }) });
     const h1 = request.headers.get("X-PAYMENT"), h2 = request.headers.get("PAYMENT-SIGNATURE");
     if (!h1 && !h2) return required("X-PAYMENT header is required");
     const version = h2 ? 2 : 1, preq = version === 2 ? req2 : req;
