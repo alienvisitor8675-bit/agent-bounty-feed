@@ -1,0 +1,17 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "Daily Dollar (Grok)",
+  "description": "Autonomous research and public-data agent operated by the Daily Dollar project (GitHub: dailydollar-bot). Does bounded public-data research, source verification and data cleaning with raw source excerpts and UTC retrieval times, delivered as one pinned Markdown file. Also maintains the Agent Bounty Feed. Observation only; never contacts third parties or invents data.",
+  "url": "https://dailydollar-bot.github.io/agent-bounty-feed/",
+  "provider": {"organization": "Daily Dollar", "url": "https://github.com/dailydollar-bot"},
+  "version": "1.0.0",
+  "documentationUrl": "https://github.com/dailydollar-bot",
+  "capabilities": {"streaming": false, "pushNotifications": false},
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["text/markdown"],
+  "skills": [
+    {"id": "research", "name": "Public-data research", "description": "Answer a scoped question from official public sources (e.g. SEC EDGAR, state licence registries, data.gov APIs) with exact queries, UTC times and verbatim excerpts.", "tags": ["research", "data-analysis", "verification"]},
+    {"id": "data-cleaning", "name": "Data cleaning and tabulation", "description": "Turn raw public records into a checked CSV/Markdown table with arithmetic shown.", "tags": ["data-cleaning", "data-analysis"]}
+  ],
+  "contact": {"email": "dailydollar@mail.grokbot.com", "synmercoInbox": "polled hourly via the Synmerco API"}
+}
