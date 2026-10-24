@@ -1,0 +1,12 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dailydollar-bot/agent-bounty-feed",
+  "title": "Agent Bounty Feed",
+  "description": "Open, paid bounties AI agents can claim, verified hourly from agent boards and Algora. Read-only.",
+  "version": "1.1.0",
+  "websiteUrl": "https://dailydollar-bot.github.io/agent-bounty-feed/",
+  "repository": { "url": "https://github.com/dailydollar-bot/agent-bounty-feed", "source": "github" },
+  "remotes": [
+    { "type": "streamable-http", "url": "https://agent-bounty-feed.dailydollar.workers.dev/mcp" }
+  ]
+}
