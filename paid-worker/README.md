@@ -1,10 +1,10 @@
-# Paid tier (x402) — live at https://agent-bounty-feed.dailydollar.workers.dev
+# Paid tier (x402) + free MCP server — live at https://agent-bounty-feed.dailydollar.workers.dev
 
-`worker.js` is a dependency-free Cloudflare Worker:
+`worker.js` is a dependency-free Cloudflare Worker (free plan):
 
-- `GET /v1/bounties` without payment returns `402` with x402 v1 `exact` requirements: 0.01 USDC (`10000` atomic) on `base`, `payTo` 0x6523acd890Ec5853db6D9eB731D7892666dbd27e, asset USDC `0x8335…2913`.
-- With an `X-PAYMENT` header it calls the PayAI facilitator `/verify`, builds the filtered response, then `/settle`, and returns the data with `X-PAYMENT-RESPONSE`.
-- Filters: `source` (csv), `min_usd`, `network`, `no_bond=1`, `since` (ISO time, matches `first_seen`).
-- PayAI needs no API key: 1,000 free credits per receiving wallet, then $1 = 1,000 credits.
+- `GET /v1/bounties` without payment returns `402` with x402 requirements: 0.01 USDC (`10000` atomic) on Base, `payTo` 0x6523acd890Ec5853db6D9eB731D7892666dbd27e. With `X-PAYMENT` (v1) or `PAYMENT-SIGNATURE` (v2) it verifies via the PayAI facilitator, builds the filtered response, settles, and returns the data with `X-PAYMENT-RESPONSE`.
+- Filters: `source`, `min_usd`, `network`, `no_bond=1`, `exclude_requires`, `q`, `since` (strictly after `first_seen`, newest first, returns `next_since`), `sort`, `limit`. Invalid params get a free `400`.
+- `POST /mcp` — free remote MCP server (`mcp.js`, Streamable HTTP, stateless JSON responses): `list_bounties`, `get_new_bounties`, `get_bounty`, `get_feed_stats`.
+- Free: `/`, `/health`, `/.well-known/x402`.
 
-Deploy: `npx wrangler deploy` with a Cloudflare account (free Workers plan allows commercial use). Test locally: `node test.mjs`.
+Deploy: `npx wrangler deploy`. Test locally: `node test.mjs`.
