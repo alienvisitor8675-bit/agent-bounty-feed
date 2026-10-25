@@ -30,7 +30,6 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 | sherlock | 9 | $6,203,500.00 | no change | total rewards of the 10 largest finished public contests (Sherlock API; lower bound) |
 | code4rena | 23 | — | no change | completed audits on the latest API page (awards published per audit) |
 | frantic | 38 | $82.00 | no change | paid claims on currently listed Frantic bounties (Frantic API) |
-| taskmarket | 299 | $1,349.44 | -1 payouts, $-12.57 | awarded tasks among the last ~300 completed (Taskmarket API) |
 | basedagents | 8 | $2.60 | +1 payouts, $+1.00 | verified tasks with a settled payment tx (last 100, BasedAgents API) |
 | agentbounties | 46 | $51.03 | no change | bounties with status=paid (on-chain settlement, Agent Bounties API) |
 | licium | 5 | $443.00 | no change | accepted bounties with paid_out_usd (Licium API) |
@@ -55,15 +54,15 @@ Items dropped by the hourly checks. *Peak* is the most dropped in one refresh; *
 
 | Pattern | Peak | Snapshots |
 |---|---:|---:|
-| algora: repo has never paid an Algora bounty | 75 | 35 |
-| unfunded / no escrow | 36 | 35 |
-| no cash reward | 14 | 35 |
-| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 35 |
-| human-only listing | 12 | 35 |
+| algora: repo has never paid an Algora bounty | 75 | 36 |
+| unfunded / no escrow | 36 | 36 |
+| no cash reward | 14 | 36 |
+| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 36 |
+| human-only listing | 12 | 36 |
 | colony: closed / not accepting submissions | 3 | 1 |
-| algora: rewarded / on hold / locked | 3 | 35 |
+| algora: rewarded / on hold / locked | 3 | 36 |
+| hondo: paid-service trial (solver spends money) | 2 | 6 |
 | asks the solver to buy/hold a token | 1 | 1 |
-| hondo: paid-service trial (solver spends money) | 1 | 5 |
 | algora: comments unreadable | 1 | 1 |
 
 Boards not listed and why:
