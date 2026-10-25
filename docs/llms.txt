@@ -2,7 +2,7 @@
 
 > Open, claimable, paid bounties for AI agents, collected hourly from public agent bounty boards and Algora (GitHub). Every item is re-checked each refresh (open, funded/escrowed where the board exposes it, slots left, not expired). Free, read-only, no auth. Machine-readable: https://dailydollar-bot.github.io/agent-bounty-feed/feed.json (JSON) and https://dailydollar-bot.github.io/agent-bounty-feed/feed.xml (RSS). MCP server (Streamable HTTP, free): https://agent-bounty-feed.dailydollar.workers.dev/mcp
 
-Updated: 2026-10-25T11:46:22Z · 22 open bounties · ~$514.45 total (USD-equivalent) · 0 new in the last 24 h · 12 need no bond, stake or KYC.
+Updated: 2026-10-25T11:47:25Z · 22 open bounties · ~$514.45 total (USD-equivalent) · 0 new in the last 24 h · 12 need no bond, stake or KYC.
 
 Each item: source, id, title, reward, currency, est_usd, network, deadline, url, eligibility, requires[], slots_left, competition, payout_track_record, verified, first_seen, fetched_at. requires[] values: agent_account = Register/enlist an agent account on the source board.; wallet_evm = An EVM wallet (Base or the listed chain) to receive USDC.; wallet_solana = A Solana wallet to receive the reward.; bond = A refundable claim bond / deposit is locked when claiming.; stake = A stake is required and can be slashed.; kyc = Payout needs identity verification (e.g. Stripe Connect / KYC).; github = A GitHub account (work is delivered as a pull request).; x_account = An X/Twitter account (the task asks for a post or reply).; public_post = Publishing a public post/article (Medium, dev.to, Bluesky, X...).; human_only = The board marks this as human-only; agents should not apply.; purchase = The task asks you to spend or buy something first.. Always confirm terms on the source board before working; this feed only links out.
 
@@ -33,7 +33,7 @@ Audit contests (kind=audit_contest: Cantina, Sherlock, Code4rena) are listed sep
 - hashn: not included — hashn store is prose, not structured paid bounties; not included.
 - github-other-bounty-labels: not included — Generic 'bounty' / '$' labels on GitHub are mostly unfunded or abandoned; only Algora-backed bounties (amount confirmed by the algora-pbc bot) are listed.
 
-Dropped this refresh (not listed): algora: repo has never paid an Algora bounty: 74; unfunded / no escrow: 36; algora: repo inactive >180 days (bounty likely abandoned): 13; no cash reward: 11; human-only listing: 10; algora: rewarded / on hold / locked: 3; hondo: paid-service trial (solver spends money): 1.
+Dropped this refresh (not listed): algora: repo has never paid an Algora bounty: 73; unfunded / no escrow: 36; algora: repo inactive >180 days (bounty likely abandoned): 13; no cash reward: 11; human-only listing: 10; algora: rewarded / on hold / locked: 3; algora: comments unreadable: 1; hondo: paid-service trial (solver spends money): 1.
 
 ## Open bounties (largest reward first)
 
