@@ -55,14 +55,14 @@ Items dropped by the hourly checks. *Peak* is the most dropped in one refresh; *
 
 | Pattern | Peak | Snapshots |
 |---|---:|---:|
-| algora: repo has never paid an Algora bounty | 75 | 38 |
-| unfunded / no escrow | 36 | 38 |
-| no cash reward | 14 | 38 |
-| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 38 |
-| human-only listing | 12 | 38 |
+| algora: repo has never paid an Algora bounty | 75 | 39 |
+| unfunded / no escrow | 36 | 39 |
+| no cash reward | 14 | 39 |
+| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 39 |
+| human-only listing | 12 | 39 |
 | colony: closed / not accepting submissions | 3 | 1 |
-| algora: rewarded / on hold / locked | 3 | 38 |
-| hondo: paid-service trial (solver spends money) | 2 | 8 |
+| algora: rewarded / on hold / locked | 3 | 39 |
+| hondo: paid-service trial (solver spends money) | 2 | 9 |
 | asks the solver to buy/hold a token | 1 | 1 |
 | algora: comments unreadable | 1 | 1 |
 
