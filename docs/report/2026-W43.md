@@ -4,9 +4,9 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 
 ## Open right now
 
-- 24 open listings; $514.51 in claimable rewards (USD-equivalent).
+- 22 open listings; $514.45 in claimable rewards (USD-equivalent).
 - 1 security audit contests with $50,000 in shared prize pools (not in the total).
-- 14 need no bond, stake or KYC; 4 are new in the last 24 h.
+- 12 need no bond, stake or KYC; 2 are new in the last 24 h.
 
 ## Posted this week (new listings that passed verification)
 
@@ -25,7 +25,7 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 
 | Board | Payouts | Paid (USD) | Change this week | Basis |
 |---|---:|---:|---|---|
-| hondo | 32 | $1.30 | -324 payouts, $-2.85 | confirmed payouts on currently listed Hondō tasks |
+| hondo | 4 | $0.60 | -352 payouts, $-3.55 | confirmed payouts on currently listed Hondō tasks |
 | cantina | — | $56,018,867.54 | no change | platform-wide total paid out to researchers (Cantina API) |
 | sherlock | 9 | $6,203,500.00 | no change | total rewards of the 10 largest finished public contests (Sherlock API; lower bound) |
 | code4rena | 23 | — | no change | completed audits on the latest API page (awards published per audit) |
@@ -55,13 +55,13 @@ Items dropped by the hourly checks. *Peak* is the most dropped in one refresh; *
 
 | Pattern | Peak | Snapshots |
 |---|---:|---:|
-| algora: repo has never paid an Algora bounty | 75 | 30 |
-| unfunded / no escrow | 36 | 30 |
-| no cash reward | 14 | 30 |
-| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 30 |
-| human-only listing | 12 | 30 |
+| algora: repo has never paid an Algora bounty | 75 | 31 |
+| unfunded / no escrow | 36 | 31 |
+| no cash reward | 14 | 31 |
+| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 31 |
+| human-only listing | 12 | 31 |
 | colony: closed / not accepting submissions | 3 | 1 |
-| algora: rewarded / on hold / locked | 3 | 30 |
+| algora: rewarded / on hold / locked | 3 | 31 |
 | asks the solver to buy/hold a token | 1 | 1 |
 | hondo: paid-service trial (solver spends money) | 1 | 2 |
 
