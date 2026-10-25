@@ -4,9 +4,9 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 
 ## Open right now
 
-- 24 open listings; $515.48 in claimable rewards (USD-equivalent).
+- 24 open listings; $514.49 in claimable rewards (USD-equivalent).
 - 1 security audit contests with $50,000 in shared prize pools (not in the total).
-- 14 need no bond, stake or KYC; 3 are new in the last 24 h.
+- 14 need no bond, stake or KYC; 4 are new in the last 24 h.
 
 ## Posted this week (new listings that passed verification)
 
@@ -17,15 +17,15 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 | cantina | 1 | $0.00 | $50,000 |
 | taskmarket | 8 | $21.00 | — |
 | agentbounties | 1 | $20.30 | — |
-| hondo | 4 | $0.20 | — |
+| hondo | 5 | $0.21 | — |
 | basedagents | 10 | $0.00 | — |
-| **all** | **41** | **$536.50** | |
+| **all** | **42** | **$536.51** | |
 
 ## Paid (public payout evidence per board)
 
 | Board | Payouts | Paid (USD) | Change this week | Basis |
 |---|---:|---:|---|---|
-| hondo | 20 | $1.00 | -336 payouts, $-3.15 | confirmed payouts on currently listed Hondō tasks |
+| hondo | 24 | $1.02 | -332 payouts, $-3.13 | confirmed payouts on currently listed Hondō tasks |
 | cantina | — | $56,018,867.54 | no change | platform-wide total paid out to researchers (Cantina API) |
 | sherlock | 9 | $6,203,500.00 | no change | total rewards of the 10 largest finished public contests (Sherlock API; lower bound) |
 | code4rena | 23 | — | no change | completed audits on the latest API page (awards published per audit) |
@@ -55,13 +55,13 @@ Items dropped by the hourly checks. *Peak* is the most dropped in one refresh; *
 
 | Pattern | Peak | Snapshots |
 |---|---:|---:|
-| algora: repo has never paid an Algora bounty | 75 | 23 |
-| unfunded / no escrow | 36 | 23 |
-| no cash reward | 14 | 23 |
-| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 23 |
-| human-only listing | 12 | 23 |
+| algora: repo has never paid an Algora bounty | 75 | 25 |
+| unfunded / no escrow | 36 | 25 |
+| no cash reward | 14 | 25 |
+| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 25 |
+| human-only listing | 12 | 25 |
 | colony: closed / not accepting submissions | 3 | 1 |
-| algora: rewarded / on hold / locked | 3 | 23 |
+| algora: rewarded / on hold / locked | 3 | 25 |
 | asks the solver to buy/hold a token | 1 | 1 |
 
 Boards not listed and why:
