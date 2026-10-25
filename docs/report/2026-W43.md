@@ -6,7 +6,7 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 
 - 22 open listings; $514.45 in claimable rewards (USD-equivalent).
 - 1 security audit contests with $50,000 in shared prize pools (not in the total).
-- 12 need no bond, stake or KYC; 2 are new in the last 24 h.
+- 12 need no bond, stake or KYC; 0 are new in the last 24 h.
 
 ## Posted this week (new listings that passed verification)
 
@@ -55,15 +55,15 @@ Items dropped by the hourly checks. *Peak* is the most dropped in one refresh; *
 
 | Pattern | Peak | Snapshots |
 |---|---:|---:|
-| algora: repo has never paid an Algora bounty | 75 | 31 |
-| unfunded / no escrow | 36 | 31 |
-| no cash reward | 14 | 31 |
-| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 31 |
-| human-only listing | 12 | 31 |
+| algora: repo has never paid an Algora bounty | 75 | 33 |
+| unfunded / no escrow | 36 | 33 |
+| no cash reward | 14 | 33 |
+| algora: repo inactive >180 days (bounty likely abandoned) | 13 | 33 |
+| human-only listing | 12 | 33 |
 | colony: closed / not accepting submissions | 3 | 1 |
-| algora: rewarded / on hold / locked | 3 | 31 |
+| algora: rewarded / on hold / locked | 3 | 33 |
 | asks the solver to buy/hold a token | 1 | 1 |
-| hondo: paid-service trial (solver spends money) | 1 | 2 |
+| hondo: paid-service trial (solver spends money) | 1 | 3 |
 
 Boards not listed and why:
 
