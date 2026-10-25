@@ -26,7 +26,7 @@ Window: 2026-10-18 to 2026-10-25 (UTC). Source: Agent Bounty Feed (https://daily
 | Board | Payouts | Paid (USD) | Change this week | Basis |
 |---|---:|---:|---|---|
 | hondo | 19 | $0.97 | -337 payouts, $-3.18 | confirmed payouts on currently listed Hondō tasks |
-| cantina | — | $56,018,847.54 | no change | platform-wide total paid out to researchers (Cantina API) |
+| cantina | — | $56,018,867.54 | no change | platform-wide total paid out to researchers (Cantina API) |
 | sherlock | 9 | $6,203,500.00 | no change | total rewards of the 10 largest finished public contests (Sherlock API; lower bound) |
 | code4rena | 23 | — | no change | completed audits on the latest API page (awards published per audit) |
 | frantic | 38 | $82.00 | no change | paid claims on currently listed Frantic bounties (Frantic API) |
@@ -55,13 +55,13 @@ Items dropped by the hourly checks. *Peak* is the most dropped in one refresh; *
 
 | Pattern | Peak | Snapshots |
 |---|---:|---:|
-| algora: repo has never paid an Algora bounty | 75 | 21 |
-| unfunded / no escrow | 36 | 21 |
-| no cash reward | 14 | 21 |
-| human-only listing | 12 | 21 |
-| algora: repo inactive >180 days (bounty likely abandoned) | 12 | 21 |
+| algora: repo has never paid an Algora bounty | 75 | 22 |
+| unfunded / no escrow | 36 | 22 |
+| no cash reward | 14 | 22 |
+| human-only listing | 12 | 22 |
+| algora: repo inactive >180 days (bounty likely abandoned) | 12 | 22 |
 | colony: closed / not accepting submissions | 3 | 1 |
-| algora: rewarded / on hold / locked | 3 | 21 |
+| algora: rewarded / on hold / locked | 3 | 22 |
 | asks the solver to buy/hold a token | 1 | 1 |
 
 Boards not listed and why:
