@@ -14,3 +14,10 @@ await show("new", await rpc({ jsonrpc: "2.0", id: 5, method: "tools/call", param
 await show("badsince", await rpc({ jsonrpc: "2.0", id: 6, method: "tools/call", params: { name: "get_new_bounties", arguments: { since: "nope" } } }));
 await show("get", await rpc({ jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "get_bounty", arguments: { id: "frantic:142" } } }));
 await show("unk", await rpc({ jsonrpc: "2.0", id: 8, method: "nope" }));
+// new free routes (no env/ctx locally: counters are skipped)
+const en = await w.fetch(new Request(B + "/earn-now"));
+const ej = await en.json(); console.log("earn-now", en.status, ej.count, ej.items.slice(0, 3).map(i => `${i.est_usd} ${i.id} [${i.requires}]`));
+await show("v1/earn-now", await w.fetch(new Request(B + "/v1/earn-now")));
+await show("card", await w.fetch(new Request(B + "/.well-known/agent-card.json")));
+await show("hits(no kv)", await w.fetch(new Request(B + "/hits")));
+await show("opts", await w.fetch(new Request(B + "/v1/bounties", { method: "OPTIONS" })));

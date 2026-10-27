@@ -3,3 +3,8 @@ account_id = "763aa25844e19b466190d729709aebbe"
 main = "worker.js"
 compatibility_date = "2026-10-01"
 workers_dev = true
+
+# Anonymous per-route daily hit counters (no IPs, no query strings). Read via GET /hits.
+[[kv_namespaces]]
+binding = "HITS"
+id = "12b75ba3081a4673bee75b0a0ad067b5"

@@ -8,6 +8,7 @@ const PRICE_ATOMIC = "10000"; // 0.01 USDC (6 decimals)
 const FACILITATOR = "https://facilitator.payai.network";
 const UPSTREAM = "https://dailydollar-bot.github.io/agent-bounty-feed/feed.json";
 import { mcp } from "./mcp.js";
+import { CARD } from "./card.js";
 
 const json = (obj, status = 200, headers = {}) =>
   new Response(JSON.stringify(obj, null, 1), { status, headers: { "content-type": "application/json", "access-control-allow-origin": "*", "access-control-expose-headers": "X-PAYMENT-RESPONSE, PAYMENT-RESPONSE, PAYMENT-REQUIRED", ...headers } });
@@ -60,6 +61,62 @@ async function facilitator(path, payload, req, version = 1) {
   try { return await r.json(); } catch { return { isValid: false, success: false, invalidReason: "facilitator " + r.status, errorReason: "facilitator " + r.status }; }
 }
 
+
+// ---- free /earn-now shortlist ----
+const EARN_EXCLUDE = new Set(["kyc", "stake", "bond", "purchase", "human_only"]);
+const USDLIKE = new Set(["USD", "USDC", "USDT", "PYUSD", "DAI", "USDG"]);
+const MCP_URL = "https://agent-bounty-feed.dailydollar.workers.dev/mcp";
+function earnUsd(i) {
+  if (typeof i.est_usd === "number") return i.est_usd;
+  if (typeof i.reward === "number" && USDLIKE.has(String(i.currency || "").toUpperCase())) return i.reward;
+  return null;
+}
+function oneLiner(i) {
+  const e = String(i.eligibility || "").replace(/\s+/g, " ").trim();
+  const first = e.split(/(?<=\.)\s/)[0] || e;
+  return first.length > 160 ? first.slice(0, 157) + "..." : first;
+}
+function earnNow(feed) {
+  const items = (feed.items || [])
+    .filter(i => (i.kind || "bounty") === "bounty")
+    .filter(i => { const u = earnUsd(i); return u !== null && u >= 1; })
+    .filter(i => !(i.requires || []).some(r => EARN_EXCLUDE.has(r)))
+    .sort((a, b) => earnUsd(b) - earnUsd(a))
+    .slice(0, 15)
+    .map(i => ({ id: i.id, title: i.title, est_usd: earnUsd(i), source: i.source, url: i.url, requires: i.requires || [], slots_left: i.slots_left ?? null, deadline: i.deadline ?? null, one_liner: oneLiner(i) }));
+  return { name: "Agent Bounty Feed — earn now", generated_at: feed.generated_at, mcp: MCP_URL, feed: UPSTREAM,
+    install: { claude: "claude mcp add --transport http agent-bounty-feed " + MCP_URL, cursor: { mcpServers: { "agent-bounty-feed": { url: MCP_URL } } } },
+    filter: "kind=bounty, est_usd>=1, excludes requires kyc/stake/bond/purchase/human_only; sorted by est_usd desc; top 15. Always confirm terms on the source board.",
+    count: items.length, items };
+}
+
+// ---- anonymous hit counters (KV, one write per request, never blocks the response) ----
+const BUCKETS = ["mcp", "earn_now", "v1_bounties_402", "v1_bounties_paid", "health", "agent_card", "other"];
+function bump(env, ctx, bucket) {
+  if (!env || !env.HITS || !ctx) return;
+  const key = "hits:" + new Date().toISOString().slice(0, 10) + ":" + bucket;
+  ctx.waitUntil((async () => { try { const n = parseInt(await env.HITS.get(key) || "0", 10) || 0; await env.HITS.put(key, String(n + 1)); } catch {} })());
+}
+async function hits(env) {
+  const totals = Object.fromEntries(BUCKETS.map(b => [b, 0])), days = {};
+  if (!env || !env.HITS) return { error: "counters unavailable", totals, days };
+  let cursor;
+  do {
+    const r = await env.HITS.list({ prefix: "hits:", cursor });
+    await Promise.all(r.keys.map(async k => {
+      const [, day, bucket] = k.name.split(":");
+      const n = parseInt(await env.HITS.get(k.name) || "0", 10) || 0;
+      totals[bucket] = (totals[bucket] || 0) + n;
+      (days[day] ||= {})[bucket] = n;
+    }));
+    cursor = r.list_complete ? null : r.cursor;
+  } while (cursor);
+  const last7 = {};
+  for (let d = 0; d < 7; d++) { const day = new Date(Date.now() - d * 864e5).toISOString().slice(0, 10); last7[day] = days[day] || {}; }
+  const since = Object.keys(days).sort()[0] || null;
+  return { service: "agent-bounty-feed", counting_since: since, note: "Anonymous per-route request counts (UTC days). No IPs or query strings stored. Counts are approximate (KV, eventually consistent).", totals, last_7_days: last7 };
+}
+
 const SORTS = new Set(["first_seen", "reward"]);
 const usd = (i) => (i.est_usd ?? i.reward ?? 0);
 
@@ -108,13 +165,34 @@ Unpaid requests get HTTP 402 with payment requirements; any x402 client (x402-fe
 Filters: source (csv, e.g. frantic,taskmarket,algora), min_usd, network (e.g. base), no_bond=1, exclude_requires (csv: kyc,stake,bond,github,x_account,public_post,purchase,human_only,...), q (text), since (ISO-8601: only items first seen strictly after it, newest first), sort (first_seen|reward), limit (1-500).
 Every paid response includes next_since: poll with since=<next_since> to get only new bounties. Invalid parameters return a free 400 (you are not charged).
 Free MCP server (Streamable HTTP, no auth): ${o}/mcp  — tools list_bounties, get_new_bounties, get_bounty, get_feed_stats (hourly data).
-Free (no payment): ${o}/health, ${o}/.well-known/x402 (discovery), and the hourly static feed https://dailydollar-bot.github.io/agent-bounty-feed/feed.json (also feed.xml, llms.txt).
+Free earn-now shortlist (no auth, poll hourly): ${o}/earn-now  — top 15 open bounties >= $1 that need no KYC/stake/bond/purchase, with MCP install one-liners.
+Free (no payment): ${o}/health, ${o}/hits (anonymous usage counters), ${o}/.well-known/agent-card.json (A2A card), ${o}/.well-known/x402 (discovery), and the hourly static feed https://dailydollar-bot.github.io/agent-bounty-feed/feed.json (also feed.xml, llms.txt).
 Pay to: ${PAY_TO} (Base USDC). Source: https://github.com/dailydollar-bot/agent-bounty-feed
 `;
 
+function bucketOf(p) {
+  if (p === "/mcp") return "mcp";
+  if (p === "/earn-now" || p === "/v1/earn-now") return "earn_now";
+  if (p === "/health") return "health";
+  if (p === "/.well-known/agent-card.json" || p === "/.well-known/agent.json") return "agent_card";
+  return "other";
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const p = url.pathname;
+    if (request.method !== "OPTIONS" && p !== "/v1/bounties" && p !== "/hits" && p !== "/v1/hits") bump(env, ctx, bucketOf(p));
+    if (p === "/v1/bounties" && request.method !== "OPTIONS") {
+      const res = await handleBounties(request, url);
+      bump(env, ctx, res.status === 200 ? "v1_bounties_paid" : res.status === 402 ? "v1_bounties_402" : "other");
+      return res;
+    }
+    return handle(request, url, env);
+  },
+};
+
+async function handle(request, url, env) {
     if (request.method === "OPTIONS") return new Response(null, { headers: { "access-control-allow-origin": "*", "access-control-allow-headers": "X-PAYMENT, PAYMENT-SIGNATURE, content-type, accept, authorization, mcp-session-id, mcp-protocol-version, last-event-id", "access-control-expose-headers": "X-PAYMENT-RESPONSE, PAYMENT-RESPONSE, PAYMENT-REQUIRED" } });
     if (url.pathname === "/" || url.pathname === "/llms.txt") {
       return new Response(INFO(url.origin), { headers: { "content-type": "text/plain; charset=utf-8", "access-control-allow-origin": "*" } });
@@ -131,7 +209,16 @@ export default {
       return json({ ok: !!feed, service: "agent-bounty-feed-paid", price: "0.01 USDC (base)", payTo: PAY_TO, feed_generated_at: feed && feed.generated_at, feed_count: feed && (feed.items || []).length, error: err });
     }
     if (url.pathname === "/mcp") return mcp(request, url, { getFeed, parseQuery, applyFilter });
-    if (url.pathname !== "/v1/bounties") return json({ error: "not found", see: url.origin + "/" }, 404);
+    if (url.pathname === "/earn-now" || url.pathname === "/v1/earn-now") {
+      try { return json(earnNow(await getFeed()), 200, { "cache-control": "public, max-age=300" }); }
+      catch (e) { return json({ error: "feed temporarily unavailable", feed: UPSTREAM }, 503); }
+    }
+    if (url.pathname === "/hits" || url.pathname === "/v1/hits") return json(await hits(env), 200, { "cache-control": "no-store" });
+    if (url.pathname === "/.well-known/agent-card.json" || url.pathname === "/.well-known/agent.json") return json(CARD);
+    return json({ error: "not found", see: url.origin + "/" }, 404);
+}
+
+async function handleBounties(request, url) {
     const { opts, errs } = parseQuery(url.searchParams);
     if (errs.length) return json({ error: "bad request (not charged)", details: errs, see: url.origin + "/" }, 400);
     const req = requirements(url), req2 = requirementsV2(url);
@@ -150,5 +237,4 @@ export default {
     if (!s.success) return required(s.errorReason || "settlement failed");
     const enc = b64(s);
     return json(body, 200, { "X-PAYMENT-RESPONSE": enc, "PAYMENT-RESPONSE": enc });
-  },
-};
+}
