@@ -81,6 +81,7 @@ function oneLiner(i) {
 const EARN_MAX_AGE_MS = 6 * 3600e3; // drop items whose last verification is older than 6 h
 function isFresh(i, now) {
   if (i.stale) return false;
+  if (i.verified && i.verified.degraded) return false; // source detail check failed this refresh: not freshly verified
   if (i.deadline) { const d = Date.parse(i.deadline); if (!Number.isNaN(d) && d <= now) return false; }
   const seen = Date.parse((i.verified && i.verified.checked_at) || i.fetched_at || "");
   return !Number.isNaN(seen) && now - seen <= EARN_MAX_AGE_MS;

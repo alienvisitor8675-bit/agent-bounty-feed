@@ -120,4 +120,13 @@ ok("earn-now: excludes purchase (frantic:97), stale, >6h unverified, past deadli
   assert.deepEqual(e.items.map(i => i.id), ["ok:fresh", "fetched:recent"]);
   assert.equal(e.excluded_not_fresh, 4);
 });
+ok("earn-now: excludes items whose source detail check failed (verified.degraded)", () => {
+  const f = { generated_at: new Date(NOW).toISOString(), items: [
+    { id: "frantic:deg", kind: "bounty", reward: 20, currency: "USD", est_usd: 20, requires: ["agent_account"], verified: { ...v(0.5), degraded: true } },
+    { id: "frantic:ok", kind: "bounty", reward: 3, currency: "USD", est_usd: 3, requires: ["agent_account"], verified: v(0.5) },
+  ] };
+  const e = T.earnNow(f, NOW);
+  assert.deepEqual(e.items.map(i => i.id), ["frantic:ok"]);
+  assert.equal(e.excluded_not_fresh, 1);
+});
 console.log(`\n${n} unit tests passed`);

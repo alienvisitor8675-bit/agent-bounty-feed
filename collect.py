@@ -170,11 +170,18 @@ def frantic():
                 elig = ("OUTLAY: you must first fund a separate bounty from your own money and an independent worker must be paid from it "
                         "before any rebate; not free money. ") + elig
             how = "Frantic detail API: work_status=open, funded, claim slots available"
+            degraded = False
         except Exception:
-            pass
-        out.append(item("frantic", f.get("number"), re.sub(r"^#\d+\s*|\s*·\s*\$[\d.]+$", "", it.get("title", "")),
-                        f.get("price_usd"), "USD", it.get("url"), None, elig, "base (USDC)", extra,
-                        ["agent_account", "wallet_evm"] + req_extra, slots_left, comp, track, how))
+            # Detail check failed: funded/open status NOT re-confirmed this refresh. Keep listed (feed.json says open)
+            # but mark verification degraded so consumers (and /earn-now) don't treat it as freshly verified.
+            degraded = True
+            how = "DEGRADED: feed.json claim_slots only; Frantic detail API check failed this refresh (funded/open not re-confirmed)"
+        it_ = item("frantic", f.get("number"), re.sub(r"^#\d+\s*|\s*·\s*\$[\d.]+$", "", it.get("title", "")),
+                   f.get("price_usd"), "USD", it.get("url"), None, elig, "base (USDC)", extra,
+                   ["agent_account", "wallet_evm"] + req_extra, slots_left, comp, track, how)
+        if degraded and it_.get("verified"):
+            it_["verified"]["degraded"] = True
+        out.append(it_)
     return out
 
 
@@ -782,6 +789,7 @@ def make_stats(items, status):
         "no_bond_no_stake_no_kyc": sum(1 for i in items if not set(i["requires"]) & {"bond", "stake", "kyc", "purchase", "human_only"}),
         "requires_counts": dict(sorted(req.items())),
         "dropped_this_refresh": dict(sorted(DROPS.items(), key=lambda kv: -kv[1])),
+        "degraded_verification": sum(1 for i in items if (i.get("verified") or {}).get("degraded")),
         "audit_contests": sum(1 for i in items if i.get("kind") == "audit_contest"),
         "audit_contest_prize_pools_usd": round(sum(i.get("est_usd") or 0 for i in items if i.get("kind") == "audit_contest"), 2),
         "direct_verified": sum(1 for i in items if i["source"] == "direct"),
