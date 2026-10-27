@@ -1,4 +1,5 @@
 import w from "./worker.js";
+await import("./unit.test.mjs"); // integrity unit tests (no network) run first
 const B = "https://x.example";
 const show = async (label, r) => console.log(label, r.status, (await r.text()).slice(0, 300).replace(/\n/g, " "));
 await show("402", await w.fetch(new Request(B + "/v1/bounties?min_usd=2")));

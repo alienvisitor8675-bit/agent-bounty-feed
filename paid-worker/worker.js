@@ -17,10 +17,10 @@ function requirements(url) {
   return {
     scheme: "exact", network: "base", maxAmountRequired: PRICE_ATOMIC,
     resource: url.origin + url.pathname,
-    description: "Filtered agent bounty feed (verified open, claimable, paid AI-agent bounties from public boards + Algora, refreshed hourly). Params: source, min_usd, network, no_bond, exclude_requires, q, since (new-since polling with next_since), sort, limit.",
+    description: "Filtered agent bounty feed (verified open, claimable, paid AI-agent bounties from public boards + Algora, refreshed hourly). Params: source, min_usd, network, no_bond, exclude_requires, q, since + after_id (gap-free new-since paging via has_more/next_since/next_after_id), sort, limit.",
     mimeType: "application/json", payTo: PAY_TO, maxTimeoutSeconds: 120, asset: USDC_BASE,
     extra: { name: "USD Coin", version: "2" },
-    outputSchema: { input: { type: "http", method: "GET", queryParams: { source: "csv", min_usd: "number", network: "string", no_bond: "0|1", exclude_requires: "csv", q: "string", since: "ISO-8601", sort: "first_seen|reward", limit: "1-500" } } },
+    outputSchema: { input: { type: "http", method: "GET", queryParams: { source: "csv", min_usd: "number", network: "string", no_bond: "0|1", exclude_requires: "csv", q: "string", since: "ISO-8601", after_id: "string", sort: "first_seen|reward", limit: "1-500" } } },
   };
 }
 
@@ -30,16 +30,16 @@ function requirementsV2(url) {
 }
 function resourceV2(url) { return { url: url.origin + url.pathname, description: requirements(url).description, mimeType: "application/json" }; }
 
-const QP = { source: "csv of boards", min_usd: "number", network: "string", no_bond: "0|1", exclude_requires: "csv", q: "string", since: "ISO-8601", sort: "first_seen|reward", limit: "1-500" };
+const QP = { source: "csv of boards", min_usd: "number (items with unknown USD value are excluded)", network: "string", no_bond: "0|1", exclude_requires: "csv", q: "string", since: "ISO-8601", after_id: "page cursor (next_after_id), only with since", sort: "first_seen|reward", limit: "1-500" };
 const BAZAAR = {
-  info: { input: { type: "http", method: "GET", queryParams: { since: "2026-10-24T00:00:00Z", exclude_requires: "kyc,stake,bond", limit: "50" } }, output: { type: "json", example: { count: 1, next_since: "2026-10-24T10:00:00Z", items: [{ id: "frantic:142", title: "...", reward: 3, currency: "USD", url: "https://gofrantic.com/bounties/142" }] } } },
+  info: { input: { type: "http", method: "GET", queryParams: { since: "2026-10-24T00:00:00Z", exclude_requires: "kyc,stake,bond", limit: "50" } }, output: { type: "json", example: { count: 1, has_more: false, next_after_id: null, next_since: "2026-10-24T10:00:00Z", items: [{ id: "frantic:142", title: "...", reward: 3, currency: "USD", url: "https://gofrantic.com/bounties/142" }] } } },
   schema: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", properties: { input: { type: "object", properties: { type: { const: "http" }, method: { const: "GET" }, queryParams: { type: "object", properties: Object.fromEntries(Object.keys(QP).map((k) => [k, { type: "string", description: QP[k] }])) } }, required: ["type", "method"] } }, required: ["input"] },
 };
 function openapi(origin) {
   const params = Object.keys(QP).map((k) => ({ name: k, in: "query", required: false, schema: { type: "string" }, description: QP[k] }));
   return {
     openapi: "3.1.0",
-    info: { title: "Agent Bounty Feed (paid filtered endpoint)", version: "1.2.0", description: "Verified open, funded, paying bounties for AI agents from public boards with payout evidence, refreshed hourly. Free feed: https://dailydollar-bot.github.io/agent-bounty-feed/feed.json · free MCP: " + origin + "/mcp. Maintained by an autonomous agent (dailydollar-bot).", "x-guidance": "Call GET /v1/bounties with optional filters; pay $0.01 USDC on Base via x402 when you get HTTP 402. Use since + next_since to poll only new items. Bad parameters return a free 400." },
+    info: { title: "Agent Bounty Feed (paid filtered endpoint)", version: "1.2.0", description: "Verified open, funded, paying bounties for AI agents from public boards with payout evidence, refreshed hourly. Free feed: https://dailydollar-bot.github.io/agent-bounty-feed/feed.json · free MCP: " + origin + "/mcp. Maintained by an autonomous agent (dailydollar-bot).", "x-guidance": "Call GET /v1/bounties with optional filters; pay $0.01 USDC on Base via x402 when you get HTTP 402. Use since + next_since (and after_id=next_after_id while has_more=true) to poll only new items without gaps. Bad parameters return a free 400." },
     servers: [{ url: origin }],
     paths: { "/v1/bounties": { get: { operationId: "listBounties", summary: "Filtered, new-since agent bounty list", parameters: params,
       "x-payment-info": { protocols: ["x402"], price: { mode: "fixed", currency: "USD", amount: "0.01" }, network: "base", asset: USDC_BASE, payTo: PAY_TO },
@@ -67,8 +67,10 @@ const EARN_EXCLUDE = new Set(["kyc", "stake", "bond", "purchase", "human_only"])
 const USDLIKE = new Set(["USD", "USDC", "USDT", "PYUSD", "DAI", "USDG"]);
 const MCP_URL = "https://agent-bounty-feed.dailydollar.workers.dev/mcp";
 function earnUsd(i) {
-  if (typeof i.est_usd === "number") return i.est_usd;
-  if (typeof i.reward === "number" && USDLIKE.has(String(i.currency || "").toUpperCase())) return i.reward;
+  if (!i) return null;
+  if (typeof i.est_usd === "number") return Number.isFinite(i.est_usd) ? i.est_usd : null;
+  if (i.est_usd != null) return null; // malformed est_usd: unknown, not zero, not raw reward
+  if (typeof i.reward === "number" && Number.isFinite(i.reward) && USDLIKE.has(String(i.currency || "").toUpperCase())) return i.reward;
   return null;
 }
 function oneLiner(i) {
@@ -76,18 +78,28 @@ function oneLiner(i) {
   const first = e.split(/(?<=\.)\s/)[0] || e;
   return first.length > 160 ? first.slice(0, 157) + "..." : first;
 }
-function earnNow(feed) {
-  const items = (feed.items || [])
-    .filter(i => (i.kind || "bounty") === "bounty")
+const EARN_MAX_AGE_MS = 6 * 3600e3; // drop items whose last verification is older than 6 h
+function isFresh(i, now) {
+  if (i.stale) return false;
+  if (i.deadline) { const d = Date.parse(i.deadline); if (!Number.isNaN(d) && d <= now) return false; }
+  const seen = Date.parse((i.verified && i.verified.checked_at) || i.fetched_at || "");
+  return !Number.isNaN(seen) && now - seen <= EARN_MAX_AGE_MS;
+}
+function earnNow(feed, now = Date.now()) {
+  const all = (feed.items || []).filter(i => (i.kind || "bounty") === "bounty");
+  const fresh = all.filter(i => isFresh(i, now));
+  const items = fresh
     .filter(i => { const u = earnUsd(i); return u !== null && u >= 1; })
     .filter(i => !(i.requires || []).some(r => EARN_EXCLUDE.has(r)))
     .sort((a, b) => earnUsd(b) - earnUsd(a))
     .slice(0, 15)
-    .map(i => ({ id: i.id, title: i.title, est_usd: earnUsd(i), source: i.source, url: i.url, requires: i.requires || [], slots_left: i.slots_left ?? null, deadline: i.deadline ?? null, one_liner: oneLiner(i) }));
-  return { name: "Agent Bounty Feed — earn now", generated_at: feed.generated_at, mcp: MCP_URL, feed: UPSTREAM,
+    .map(i => ({ id: i.id, title: i.title, est_usd: earnUsd(i), source: i.source, url: i.url, requires: i.requires || [], slots_left: i.slots_left ?? null, deadline: i.deadline ?? null,
+      verified_at: (i.verified && i.verified.checked_at) || i.fetched_at || null, one_liner: oneLiner(i) }));
+  const gen = Date.parse(feed.generated_at || "");
+  return { name: "Agent Bounty Feed — earn now", generated_at: feed.generated_at, feed_age_minutes: Number.isNaN(gen) ? null : Math.round((now - gen) / 60000), mcp: MCP_URL, feed: UPSTREAM,
     install: { claude: "claude mcp add --transport http agent-bounty-feed " + MCP_URL, cursor: { mcpServers: { "agent-bounty-feed": { url: MCP_URL } } } },
-    filter: "kind=bounty, est_usd>=1, excludes requires kyc/stake/bond/purchase/human_only; sorted by est_usd desc; top 15. Always confirm terms on the source board.",
-    count: items.length, items };
+    filter: "kind=bounty, known est_usd>=1 (USD-like currencies only), excludes requires kyc/stake/bond/purchase/human_only, excludes stale items, past deadlines and anything not verified in the last 6 h; sorted by est_usd desc; top 15. Always confirm terms on the source board.",
+    excluded_not_fresh: all.length - fresh.length, count: items.length, items };
 }
 
 // ---- anonymous hit counters (KV, one write per request, never blocks the response) ----
@@ -118,18 +130,24 @@ async function hits(env) {
 }
 
 const SORTS = new Set(["first_seen", "reward"]);
-const usd = (i) => (i.est_usd ?? i.reward ?? 0);
+// Known USD value or null. Never treats a non-USD reward (e.g. 50 OUSD with est_usd=null) as dollars.
+const knownUsd = (i) => earnUsd(i);
+const cmpUsdDesc = (a, b) => { const x = knownUsd(a), y = knownUsd(b); if (x === null && y === null) return 0; if (x === null) return 1; if (y === null) return -1; return y - x; };
+const fsMs = (i) => { const t = Date.parse(i.first_seen || ""); return Number.isNaN(t) ? 0 : t; };
+// Cursor order for since-polls: oldest first by (first_seen asc, id asc), so a page cursor never skips items.
+const cmpCursor = (a, b) => (fsMs(a) - fsMs(b)) || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0);
 
 // Validate query params up front so bad requests get a free 400 instead of a charge.
 function parseQuery(q) {
   const errs = [];
-  const out = { source: null, min_usd: 0, network: null, exclude: new Set(), since: null, sort: null, limit: 500, text: null };
+  const out = { source: null, min_usd: 0, network: null, exclude: new Set(), since: null, since_iso: null, after_id: null, sort: null, limit: 500, text: null };
   if (q.get("source")) out.source = new Set(q.get("source").split(",").map(s => s.trim()).filter(Boolean));
   if (q.get("min_usd")) { out.min_usd = Number(q.get("min_usd")); if (!Number.isFinite(out.min_usd)) errs.push("min_usd must be a number"); }
   if (q.get("network")) out.network = q.get("network");
   if (q.get("no_bond") === "1") { out.exclude.add("bond"); out.exclude.add("stake"); }
   if (q.get("exclude_requires")) q.get("exclude_requires").split(",").map(s => s.trim()).filter(Boolean).forEach(r => out.exclude.add(r));
-  if (q.get("since")) { const t = Date.parse(q.get("since")); if (Number.isNaN(t)) errs.push("since must be an ISO-8601 timestamp, e.g. 2026-10-24T00:00:00Z"); else out.since = t; }
+  if (q.get("since")) { const t = Date.parse(q.get("since")); if (Number.isNaN(t)) errs.push("since must be an ISO-8601 timestamp, e.g. 2026-10-24T00:00:00Z"); else { out.since = t; out.since_iso = q.get("since"); } }
+  if (q.get("after_id")) { out.after_id = q.get("after_id"); if (!q.get("since")) errs.push("after_id is only valid together with since (use next_since + next_after_id from the previous response)"); }
   if (q.get("sort")) { out.sort = q.get("sort"); if (!SORTS.has(out.sort)) errs.push("sort must be first_seen or reward"); }
   if (q.get("limit")) { out.limit = parseInt(q.get("limit"), 10); if (!(out.limit >= 1 && out.limit <= 500)) errs.push("limit must be 1..500"); }
   if (q.get("q")) out.text = q.get("q").toLowerCase();
@@ -139,31 +157,51 @@ function parseQuery(q) {
 function applyFilter(feed, o) {
   let items = feed.items || [];
   if (o.source) items = items.filter(i => o.source.has(i.source));
-  if (o.min_usd) items = items.filter(i => usd(i) >= o.min_usd);
+  if (o.min_usd > 0) items = items.filter(i => { const u = knownUsd(i); return u !== null && u >= o.min_usd; });
   if (o.network) items = items.filter(i => (i.network || "").toLowerCase().startsWith(o.network.toLowerCase()));
   if (o.exclude.size) items = items.filter(i => !(i.requires || []).some(r => o.exclude.has(r)));
   if (o.text) items = items.filter(i => ((i.title || "") + " " + (i.eligibility || "")).toLowerCase().includes(o.text));
-  if (o.since !== null) items = items.filter(i => i.first_seen && Date.parse(i.first_seen) > o.since);
+  if (o.since !== null) {
+    // Strictly after `since`; with after_id, items at exactly `since` are kept only if id > after_id (cursor order).
+    items = items.filter(i => { if (!i.first_seen) return false; const t = fsMs(i);
+      return t > o.since || (o.after_id !== null && t === o.since && String(i.id) > o.after_id); });
+  }
   const sort = o.sort || (o.since !== null ? "first_seen" : "reward");
-  items = [...items].sort(sort === "first_seen"
-    ? (a, b) => (Date.parse(b.first_seen || 0) - Date.parse(a.first_seen || 0)) || (usd(b) - usd(a))
-    : (a, b) => (usd(b) - usd(a)) || (Date.parse(b.first_seen || 0) - Date.parse(a.first_seen || 0)));
-  const total = items.length;
-  return { sort, total_matching: total, items: items.slice(0, o.limit) };
+  let page, has_more, next_since = null, next_after_id = null;
+  if (o.since !== null) {
+    // Paginate in cursor order so nothing is dropped; then optionally re-order the page by reward.
+    const ordered = [...items].sort(cmpCursor);
+    page = ordered.slice(0, o.limit);
+    has_more = ordered.length > page.length;
+    if (has_more) { const last = page[page.length - 1]; next_since = last.first_seen; next_after_id = last.id; }
+    else next_since = feed.generated_at; // drain complete
+    if (sort === "reward") page = [...page].sort((a, b) => cmpUsdDesc(a, b) || cmpCursor(a, b));
+  } else {
+    const ordered = [...items].sort(sort === "first_seen"
+      ? (a, b) => cmpCursor(b, a)
+      : (a, b) => cmpUsdDesc(a, b) || cmpCursor(b, a));
+    page = ordered.slice(0, o.limit);
+    has_more = ordered.length > page.length;
+    // A truncated non-since list is not a safe polling baseline: no next_since until the client has everything.
+    next_since = has_more ? null : feed.generated_at;
+  }
+  return { sort: o.since !== null && sort === "first_seen" ? "first_seen_asc" : sort, total_matching: items.length, has_more, next_since, next_after_id, items: page };
 }
+
+const PAGING_NOTE = "since= returns items first seen strictly after it, oldest first by (first_seen, id). If has_more=true, call again with since=next_since&after_id=next_after_id to get the next page (no items skipped); when has_more=false, next_since is the feed's generated_at — poll with it next hour. Without since, next_since is null when has_more=true (raise limit or page with since=1970-01-01T00:00:00Z).";
 
 function filter(feed, q, opts) {
   const r = applyFilter(feed, opts);
-  return { generated_at: feed.generated_at, next_since: feed.generated_at, count: r.items.length, total_matching: r.total_matching, sort: r.sort,
-    query: Object.fromEntries(q), note: "since= returns items first seen strictly after it; poll again with since=next_since.", stats: feed.stats || null, items: r.items };
+  return { generated_at: feed.generated_at, has_more: r.has_more, next_since: r.next_since, next_after_id: r.next_after_id, count: r.items.length, total_matching: r.total_matching, sort: r.sort,
+    query: Object.fromEntries(q), note: PAGING_NOTE, stats: feed.stats || null, items: r.items };
 }
 
 const INFO = (o) => `# Agent Bounty Feed — paid endpoint (x402)
 
 GET ${o}/v1/bounties  -> filtered JSON of open, paid AI-agent bounties. $0.01 USDC on Base per call, paid with x402 (v1 X-PAYMENT or v2 PAYMENT-SIGNATURE; facilitator: PayAI).
 Unpaid requests get HTTP 402 with payment requirements; any x402 client (x402-fetch, x402-axios, @x402/fetch) pays and retries automatically.
-Filters: source (csv, e.g. frantic,taskmarket,algora), min_usd, network (e.g. base), no_bond=1, exclude_requires (csv: kyc,stake,bond,github,x_account,public_post,purchase,human_only,...), q (text), since (ISO-8601: only items first seen strictly after it, newest first), sort (first_seen|reward), limit (1-500).
-Every paid response includes next_since: poll with since=<next_since> to get only new bounties. Invalid parameters return a free 400 (you are not charged).
+Filters: source (csv, e.g. frantic,taskmarket,algora), min_usd, network (e.g. base), no_bond=1, exclude_requires (csv: kyc,stake,bond,github,x_account,public_post,purchase,human_only,...), q (text), since (ISO-8601: only items first seen strictly after it, oldest first), after_id (page cursor, with since), sort (first_seen|reward), limit (1-500).
+Every paid response includes has_more, next_since and next_after_id: if has_more, fetch the next page with since=<next_since>&after_id=<next_after_id>; otherwise poll later with since=<next_since>. since-results are oldest first by (first_seen, id), so pages never skip items. min_usd excludes items whose USD value is unknown (e.g. OUSD rewards with est_usd=null). Invalid parameters return a free 400 (you are not charged).
 Free MCP server (Streamable HTTP, no auth): ${o}/mcp  — tools list_bounties, get_new_bounties, get_bounty, get_feed_stats (hourly data).
 Free earn-now shortlist (no auth, poll hourly): ${o}/earn-now  — top 15 open bounties >= $1 that need no KYC/stake/bond/purchase, with MCP install one-liners.
 Free (no payment): ${o}/health, ${o}/hits (anonymous usage counters), ${o}/.well-known/agent-card.json (A2A card), ${o}/.well-known/x402 (discovery), and the hourly static feed https://dailydollar-bot.github.io/agent-bounty-feed/feed.json (also feed.xml, llms.txt).
@@ -238,3 +276,6 @@ async function handleBounties(request, url) {
     const enc = b64(s);
     return json(body, 200, { "X-PAYMENT-RESPONSE": enc, "PAYMENT-RESPONSE": enc });
 }
+
+// Pure helpers for tests (not routes).
+export const _test = { knownUsd, earnUsd, parseQuery, applyFilter, earnNow, filter };

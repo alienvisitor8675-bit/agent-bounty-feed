@@ -99,9 +99,22 @@ def text_requires(t):
         r.append("x_account")
     if re.search(r"\b(medium|dev\.to|bluesky|publish (?:your|an|a)|blog post|article)\b", t):
         r.append("public_post")
-    if re.search(r"\b(buy|purchase|hold) (?:\$?\d|some|it|the token|tokens?)\b", t):
+    if re.search(r"\b(buy|purchase|hold) (?:\$?\d|some|it|the token|tokens?)\b", t) or funds_other_work(t):
         r.append("purchase")
     return r
+
+
+# Rebates/"on the house" offers that pay you back only after you fund someone else's work are an outlay, not free money
+# (e.g. Frantic #97: fund a >= $10 bounty, an independent worker must be paid from your funds, then claim $10 back).
+FUND_OTHER_RE = re.compile(
+    r"on the house|\brebate|\bfund (?:it|a|an|another|your|the) (?:\$?\d+ )?(?:bounty|posting|task|job)|\bfund it\b|"
+    r"paid from your funds|from your funds|your funding receipt|funding receipt'?s payer|"
+    r"\bpost (?:a|an|another|your own) (?:funded )?(?:bounty|task|job)\b.*\b(?:fund|pay)|"
+    r"\bpay (?:a|an|another) (?:independent |different |real )?worker\b")
+
+
+def funds_other_work(t):
+    return bool(FUND_OTHER_RE.search((t or "").lower()))
 
 
 def past(deadline):
@@ -127,6 +140,7 @@ def frantic():
             drop("frantic: no claim slots left")
             continue
         extra, elig = {"claim_slots": slots}, "Enlist a Frantic agent (gofrantic.com). Paid in USDC after auto + sponsor review."
+        req_extra = ["purchase"] if funds_other_work(it.get("title", "") + " " + (it.get("content_text") or "")) else []
         slots_left, track, comp, how = slots.get("available"), None, None, "feed.json claim_slots"
         try:
             b = get(f["api_url"])["bounty"]
@@ -151,12 +165,16 @@ def frantic():
             if b.get("required_artifacts"):
                 elig += f" Artifacts: {', '.join(b['required_artifacts'])}."
             elig += f" So far {cp.get('paid',0)} paid / {cp.get('rejected',0)} rejected."
+            if funds_other_work(" ".join(str(b.get(k) or "") for k in ("title", "description", "criteria"))):
+                req_extra.append("purchase")
+                elig = ("OUTLAY: you must first fund a separate bounty from your own money and an independent worker must be paid from it "
+                        "before any rebate; not free money. ") + elig
             how = "Frantic detail API: work_status=open, funded, claim slots available"
         except Exception:
             pass
         out.append(item("frantic", f.get("number"), re.sub(r"^#\d+\s*|\s*·\s*\$[\d.]+$", "", it.get("title", "")),
                         f.get("price_usd"), "USD", it.get("url"), None, elig, "base (USDC)", extra,
-                        ["agent_account", "wallet_evm"], slots_left, comp, track, how))
+                        ["agent_account", "wallet_evm"] + req_extra, slots_left, comp, track, how))
     return out
 
 
@@ -513,8 +531,9 @@ def hondo():
         title = t.get("title") or c.get("title") or tt
         if title and c.get("title") and title != c.get("title"):
             title = f"{c.get('title')} ({title})"
-        elig = (f"Hondō task type {tt}; claim via API (no key), lease-based, one open claim per reward address. Reward {amt:g} USDC on Base"
-                f"{' (up to; reduced for low-quality answers)' if 'normal_amount_atomic' in rw or 'correct_amount_atomic' in rw else ''}. Read the immutable task guide before claiming: {c.get('definition_url')}")
+        caveat = ("Caveat: respondent-profile task; the guide may limit who may answer (group/membership), not verified by this feed. ") if re.search(r"respondent", f"{title} {c.get('title') or ''}", re.I) else ""
+        elig = caveat + (f"Hondō task type {tt}; claim via API (no key), lease-based, one open claim per reward address. Reward {amt:g} USDC on Base"
+                f"{' (up to; reduced for low-quality answers)' if 'normal_amount_atomic' in rw or 'correct_amount_atomic' in rw else ''}. Read the immutable task guide before claiming: {'see extra.definition_url' if caveat else c.get('definition_url')}")
         out.append(item("hondo", c["task_id"][-12:], title, amt, "USDC", c["detail_url"], t.get("expires_at") or c.get("claim_before"), elig, "base",
                         {"task_type": tt, "definition_url": c.get("definition_url"), "board": base + "/agent-taskboard.html"},
                         ["wallet_evm"], int(cap) if cap is not None else None,
@@ -795,7 +814,7 @@ def write_all(items, status):
         "contact": CONTACT,
         "paid_endpoint": ({"url": PAID + "/v1/bounties", "protocol": "x402", "price": "0.01", "token": "USDC", "network": "base",
                            "pay_to": TIP, "facilitator": "https://facilitator.payai.network",
-                           "filters": ["source", "min_usd", "network", "no_bond", "exclude_requires", "since", "sort", "limit"], "info": PAID + "/"} if PAID else None),
+                           "filters": ["source", "min_usd", "network", "no_bond", "exclude_requires", "since", "after_id", "sort", "limit"], "info": PAID + "/"} if PAID else None),
         "mcp_endpoint": (PAID + "/mcp" if PAID else None),
         "items": items,
     }
@@ -870,7 +889,7 @@ def write_all(items, status):
               "Serves this same hourly feed. Claude Code: `claude mcp add --transport http agent-bounty-feed " + PAID + "/mcp`.", "",
               "## Paid filtered endpoint (x402)", "",
               f"GET {PAID}/v1/bounties — same data, filtered server-side: source (csv), min_usd, network, no_bond=1, exclude_requires (csv, e.g. kyc,stake,bond), "
-              "since (ISO-8601; returns only items first seen after it, newest first), sort (first_seen|reward), limit. Responses include next_since for polling. "
+              "since (ISO-8601; returns only items first seen after it, oldest first by first_seen+id), after_id (page cursor), sort (first_seen|reward), limit. Responses include has_more, next_since and next_after_id: while has_more, page with since=next_since&after_id=next_after_id (no gaps). min_usd excludes items with unknown USD value. "
               f"$0.01 USDC on Base per call via x402 (HTTP 402; v1 X-PAYMENT or v2 PAYMENT-SIGNATURE; facilitator PayAI). "
               f"Unpaid requests get a 402 with payment requirements; x402 clients pay and retry automatically. Bad parameters get a free 400. Free info: {PAID}/ · health: {PAID}/health. "
               "The free feed above stays free.", ""]
@@ -909,7 +928,7 @@ def write_all(items, status):
 <p><b>MCP server (free):</b> <code>{html.escape(PAID)}/mcp</code> (Streamable HTTP, no auth). Tools: <code>list_bounties</code>, <code>get_new_bounties</code>, <code>get_bounty</code>, <code>get_feed_stats</code>.<br>
 Claude Code: <code>claude mcp add --transport http agent-bounty-feed {html.escape(PAID)}/mcp</code><br>
 Cursor / other clients: <code>{{"mcpServers":{{"agent-bounty-feed":{{"url":"{html.escape(PAID)}/mcp"}}}}}}</code></p>
-<p><b>Paid, filtered endpoint (x402):</b> <code>GET {html.escape(PAID)}/v1/bounties?since=2026-10-24T00:00:00Z&amp;exclude_requires=kyc,stake,bond</code> — $0.01 USDC on Base per call, paid with <a href="https://x402.org">x402</a>. Filters: <code>source</code>, <code>min_usd</code>, <code>network</code>, <code>no_bond=1</code>, <code>exclude_requires</code>, <code>since</code> (new items only, newest first, with <code>next_since</code> for polling), <code>sort</code>, <code>limit</code>. <a href="{html.escape(PAID)}/">Info</a> · <a href="{html.escape(PAID)}/health">health</a>. The free feed stays free.</p>
+<p><b>Paid, filtered endpoint (x402):</b> <code>GET {html.escape(PAID)}/v1/bounties?since=2026-10-24T00:00:00Z&amp;exclude_requires=kyc,stake,bond</code> — $0.01 USDC on Base per call, paid with <a href="https://x402.org">x402</a>. Filters: <code>source</code>, <code>min_usd</code>, <code>network</code>, <code>no_bond=1</code>, <code>exclude_requires</code>, <code>since</code> (new items only, oldest first; page gap-free with <code>has_more</code> / <code>next_since</code> / <code>after_id</code>), <code>sort</code>, <code>limit</code>. <a href="{html.escape(PAID)}/">Info</a> · <a href="{html.escape(PAID)}/health">health</a>. The free feed stays free.</p>
 ''' if PAID else "")
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Agent Bounty Feed — open paid bounties for AI agents ({len(items)} open, ${total:g})</title>

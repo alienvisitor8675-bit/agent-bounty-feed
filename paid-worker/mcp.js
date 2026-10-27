@@ -6,7 +6,7 @@ const CORS = { "access-control-allow-origin": "*", "access-control-expose-header
 
 const FILTER_PROPS = {
   source: { type: "string", description: "Comma-separated boards: frantic, taskmarket, algora, agentbounties, basedagents, superteam, licium, hondo, cantina, sherlock, code4rena, direct (cantina/sherlock/code4rena are audit contests, kind=audit_contest)" },
-  min_usd: { type: "number", description: "Minimum reward in USD-equivalent" },
+  min_usd: { type: "number", description: "Minimum reward in USD-equivalent; items with unknown USD value (e.g. OUSD with est_usd=null) are excluded when > 0" },
   network: { type: "string", description: "Payout network prefix, e.g. base, solana, tempo" },
   exclude_requires: { type: "string", description: "Comma-separated requirements to exclude: kyc, stake, bond, github, x_account, public_post, purchase, human_only, agent_account, wallet_evm, wallet_solana" },
   q: { type: "string", description: "Case-insensitive text search in title and eligibility" },
@@ -18,8 +18,8 @@ const TOOLS = [
     inputSchema: { type: "object", properties: { ...FILTER_PROPS, sort: { type: "string", enum: ["reward", "first_seen"], description: "reward (default) or first_seen (newest first)" } } },
     annotations: { readOnlyHint: true, openWorldHint: true } },
   { name: "get_new_bounties", title: "Bounties first seen since a time",
-    description: "Bounties first seen strictly after `since` (ISO-8601), newest first. Returns next_since: pass it next time to get only new items.",
-    inputSchema: { type: "object", properties: { since: { type: "string", description: "ISO-8601 timestamp, e.g. 2026-10-24T00:00:00Z" }, ...FILTER_PROPS }, required: ["since"] },
+    description: "Bounties first seen strictly after `since` (ISO-8601), oldest first by (first_seen, id). If has_more=true, call again with since=next_since and after_id=next_after_id (no items are skipped); when has_more=false, next_since is the feed time to poll from next.",
+    inputSchema: { type: "object", properties: { since: { type: "string", description: "ISO-8601 timestamp, e.g. 2026-10-24T00:00:00Z" }, after_id: { type: "string", description: "Page cursor: next_after_id from the previous response (use with its next_since)" }, ...FILTER_PROPS }, required: ["since"] },
     annotations: { readOnlyHint: true, openWorldHint: true } },
   { name: "get_bounty", title: "Get one bounty",
     description: "Full record for one bounty id from list_bounties (e.g. frantic:142, taskmarket:TSK-XXXX, algora:owner/repo#123).",
@@ -37,7 +37,7 @@ const slim = (i) => ({ id: i.id, source: i.source, title: i.title, reward: i.rew
 
 function toQuery(args) {
   const p = new URLSearchParams();
-  for (const k of ["source", "min_usd", "network", "exclude_requires", "q", "since", "sort"]) if (args[k] !== undefined && args[k] !== null && args[k] !== "") p.set(k, String(args[k]));
+  for (const k of ["source", "min_usd", "network", "exclude_requires", "q", "since", "after_id", "sort"]) if (args[k] !== undefined && args[k] !== null && args[k] !== "") p.set(k, String(args[k]));
   const lim = Math.max(1, Math.min(100, parseInt(args.limit ?? 20, 10) || 20));
   p.set("limit", String(lim));
   return p;
@@ -53,11 +53,11 @@ async function callTool(name, args, d) {
   }
   if (name === "list_bounties" || name === "get_new_bounties") {
     if (name === "get_new_bounties" && !args.since) throw new ToolError("since is required (ISO-8601)");
-    if (name === "list_bounties") delete args.since;
+    if (name === "list_bounties") { delete args.since; delete args.after_id; }
     const { opts, errs } = d.parseQuery(toQuery(args));
     if (errs.length) throw new ToolError(errs.join("; "));
     const r = d.applyFilter(feed, opts);
-    return { generated_at: feed.generated_at, next_since: feed.generated_at, sort: r.sort, count: r.items.length, total_matching: r.total_matching, items: r.items.map(slim), note: PAID_NOTE };
+    return { generated_at: feed.generated_at, has_more: r.has_more, next_since: r.next_since, next_after_id: r.next_after_id, sort: r.sort, count: r.items.length, total_matching: r.total_matching, items: r.items.map(slim), note: PAID_NOTE };
   }
   throw new RpcError(-32602, `Unknown tool: ${name}`);
 }
@@ -75,7 +75,7 @@ async function handle(msg, d) {
         const v = SUPPORTED.includes(params.protocolVersion) ? params.protocolVersion : SUPPORTED[0];
         result = { protocolVersion: v, capabilities: { tools: { listChanged: false } },
           serverInfo: { name: "agent-bounty-feed", title: "Agent Bounty Feed", version: "1.2.0", websiteUrl: "https://dailydollar-bot.github.io/agent-bounty-feed/" },
-          instructions: "Find open, paid bounties an AI agent can claim. Start with get_feed_stats or list_bounties (filter with exclude_requires=kyc,stake,bond for no-friction work). Poll get_new_bounties with since=next_since. " + PAID_NOTE };
+          instructions: "Find open, paid bounties an AI agent can claim. Start with get_feed_stats or list_bounties (filter with exclude_requires=kyc,stake,bond for no-friction work). Poll get_new_bounties with since=next_since (plus after_id=next_after_id while has_more=true). " + PAID_NOTE };
         break;
       }
       case "ping": result = {}; break;
