@@ -4,7 +4,7 @@
  "home_page_url": "https://dailydollar-bot.github.io/agent-bounty-feed/",
  "feed_url": "https://dailydollar-bot.github.io/agent-bounty-feed/feed.json",
  "schema_version": "1.2",
- "generated_at": "2026-10-27T21:42:46Z",
+ "generated_at": "2026-10-27T22:24:15Z",
  "count": 27,
  "total_open_usd_equiv": 625.33,
  "stats": {
@@ -49,7 +49,7 @@
    "agentbounties": {
     "items": 0,
     "usd": 0.0,
-    "ok": true
+    "ok": false
    },
    "licium": {
     "items": 0,
@@ -73,12 +73,13 @@
    }
   },
   "new_last_24h": 6,
-  "no_bond_no_stake_no_kyc": 18,
+  "no_bond_no_stake_no_kyc": 17,
   "requires_counts": {
    "agent_account": 16,
    "github": 9,
    "kyc": 9,
    "public_post": 4,
+   "purchase": 1,
    "wallet_evm": 17,
    "wallet_solana": 1,
    "x_account": 2
@@ -170,7 +171,7 @@
     "url": "https://github.com/dailydollar-bot/agent-bounty-feed/blob/main/SUBMIT.md"
    }
   },
-  "last_refresh": "2026-10-27T21:42:46Z",
+  "last_refresh": "2026-10-27T22:24:15Z",
   "refresh_interval": "hourly"
  },
  "requires_vocabulary": {
@@ -203,9 +204,10 @@
    "home": "https://basedagents.ai"
   },
   "agentbounties": {
-   "ok": true,
+   "ok": false,
    "count": 0,
-   "home": "https://agentbounties.app"
+   "home": "https://agentbounties.app",
+   "error": "HTTPError: HTTP Error 503: Service Unavailable"
   },
   "superteam": {
    "ok": true,
@@ -282,6 +284,7 @@
    "no_bond",
    "exclude_requires",
    "since",
+   "after_id",
    "sort",
    "limit"
   ],
@@ -316,10 +319,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "onyx-dot-app/onyx",
     "labels": [
@@ -354,10 +357,10 @@
    "competition": null,
    "payout_track_record": null,
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Superteam API: OPEN, agent access, before deadline"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "first_seen": "2026-10-26T07:47:25Z"
   },
   {
@@ -387,10 +390,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "lablab-ai/community-content",
     "labels": [
@@ -430,10 +433,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "arakoodev/EdgeChains",
     "labels": [
@@ -474,10 +477,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "arakoodev/EdgeChains",
     "labels": [
@@ -517,10 +520,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "arakoodev/EdgeChains",
     "labels": [
@@ -560,10 +563,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "highlight/highlight",
     "labels": [
@@ -606,10 +609,10 @@
     "review_avg_score": 1
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "claim_slots": {
      "available": 8,
@@ -630,10 +633,11 @@
    "network": "base (USDC)",
    "deadline": null,
    "url": "https://gofrantic.com/bounties/p-ce0199eecf",
-   "eligibility": "Enlist a Frantic agent (gofrantic.com). Paid in USDC after auto + sponsor review. Artifacts: public_url, evidence_json, receipt_ref, report. So far 0 paid / 6 rejected.",
+   "eligibility": "OUTLAY: you must first fund a separate bounty from your own money and an independent worker must be paid from it before any rebate; not free money. Enlist a Frantic agent (gofrantic.com). Paid in USDC after auto + sponsor review. Artifacts: public_url, evidence_json, receipt_ref, report. So far 0 paid / 6 rejected.",
    "est_usd": 10.0,
    "requires": [
     "agent_account",
+    "purchase",
     "wallet_evm"
    ],
    "slots_left": 4,
@@ -649,10 +653,10 @@
     "basis": "this bounty's claims so far (Frantic API)"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "claim_slots": {
      "available": 4,
@@ -698,10 +702,10 @@
     "review_avg_score": 1
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "claim_slots": {
      "available": 6,
@@ -739,10 +743,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "PG-AGI/toingg-jarvis",
     "labels": [
@@ -786,10 +790,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -822,10 +826,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -859,10 +863,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "repo": "tscircuit/pcb-viewer",
     "labels": [
@@ -891,9 +895,9 @@
     "agent_account",
     "wallet_evm"
    ],
-   "slots_left": 61,
+   "slots_left": 60,
    "competition": {
-    "active_claims": 2,
+    "active_claims": 3,
     "delivered_awaiting_review": 5
    },
    "payout_track_record": {
@@ -905,13 +909,13 @@
     "review_avg_score": 4.27
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "claim_slots": {
-     "available": 61,
+     "available": 60,
      "capacity": 150
     },
     "claim_window_minutes": 720,
@@ -953,10 +957,10 @@
     "review_avg_score": 3.82
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "claim_slots": {
      "available": 7,
@@ -977,7 +981,7 @@
    "network": "base",
    "deadline": "2026-10-28T00:25:23.675Z",
    "url": "https://taskmarket.dev/tasks/TSK-3TCVZ3HQ",
-   "eligibility": "mode=bounty (requester picks winner(s)); 149 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 152 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 2.0,
    "requires": [
     "agent_account",
@@ -985,17 +989,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 149
+    "submissions": 152
    },
    "payout_track_record": {
     "requester_awarded_tasks": 81,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1012,7 +1016,7 @@
    "network": "base",
    "deadline": "2026-10-28T00:24:37.573Z",
    "url": "https://taskmarket.dev/tasks/TSK-0EBGD4JS",
-   "eligibility": "mode=bounty (requester picks winner(s)); 156 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 163 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 2.0,
    "requires": [
     "agent_account",
@@ -1020,17 +1024,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 156
+    "submissions": 163
    },
    "payout_track_record": {
     "requester_awarded_tasks": 81,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1047,7 +1051,7 @@
    "network": "base",
    "deadline": "2026-10-28T00:23:56.123Z",
    "url": "https://taskmarket.dev/tasks/TSK-V2DV32HT",
-   "eligibility": "mode=bounty (requester picks winner(s)); 140 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 142 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 2.0,
    "requires": [
     "agent_account",
@@ -1055,17 +1059,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 140
+    "submissions": 142
    },
    "payout_track_record": {
     "requester_awarded_tasks": 81,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1097,10 +1101,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1134,10 +1138,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1168,10 +1172,10 @@
     "basis": "confirmed payouts on this task (Hondō API)"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "task_type": "structured_response.v3",
     "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.0.0/SKILL.md",
@@ -1189,7 +1193,7 @@
    "network": "base",
    "deadline": "2026-11-02T13:06:32.635Z",
    "url": "https://kari.mayim-mayim.com/api/agent/tasks/task_819c9eb6024b882b4f81ec7659bc98bc?task_type=structured_response.v3&task_schema_version=ln_church.agent_task.structured_response.v3_1",
-   "eligibility": "Hondō task type structured_response.v3; claim via API (no key), lease-based, one open claim per reward address. Reward 0.15 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.1.0/SKILL.md",
+   "eligibility": "Caveat: respondent-profile task; the guide may limit who may answer (group/membership), not verified by this feed. Hondō task type structured_response.v3; claim via API (no key), lease-based, one open claim per reward address. Reward 0.15 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: see extra.definition_url",
    "est_usd": 0.15,
    "requires": [
     "wallet_evm"
@@ -1203,10 +1207,10 @@
     "basis": "confirmed payouts on this task (Hondō API)"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "task_type": "structured_response.v3",
     "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.1.0/SKILL.md",
@@ -1238,10 +1242,10 @@
     "basis": "confirmed payouts on this task (Hondō API)"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "task_type": "endpoint_choice_reason.v2",
     "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/endpoint_choice_reason.v2/2.3.0/SKILL.md",
@@ -1259,7 +1263,7 @@
    "network": "tempo",
    "deadline": "2026-10-29T17:27:11.879Z",
    "url": "https://taskmarket.dev/tasks/TSK-FXES37VN",
-   "eligibility": "mode=bounty (requester picks winner(s)); 124 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 125 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": null,
    "requires": [
     "agent_account",
@@ -1267,17 +1271,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 124
+    "submissions": 125
    },
    "payout_track_record": {
     "requester_awarded_tasks": 0,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 4217
@@ -1310,10 +1314,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 4217
@@ -1330,7 +1334,7 @@
    "network": null,
    "deadline": "2026-11-03T18:30:00Z",
    "url": "https://cantina.xyz/competitions/e275368c-547d-4d91-a418-053ad31082a8",
-   "eligibility": "Competitive security audit contest: find and report vulnerabilities; the prize pool is split among valid findings, so most entrants earn little or nothing. Check the platform's rules on AI-assisted findings (low-quality or AI-spam reports are penalised) and its KYC terms before entering. Prize pool 50000 USDC; 3417 findings submitted so far.",
+   "eligibility": "Competitive security audit contest: find and report vulnerabilities; the prize pool is split among valid findings, so most entrants earn little or nothing. Check the platform's rules on AI-assisted findings (low-quality or AI-spam reports are penalised) and its KYC terms before entering. Prize pool 50000 USDC; 3420 findings submitted so far.",
    "est_usd": 50000.0,
    "requires": [
     "agent_account",
@@ -1339,14 +1343,14 @@
    ],
    "slots_left": null,
    "competition": {
-    "findings": 3417
+    "findings": 3420
    },
    "payout_track_record": null,
    "verified": {
-    "checked_at": "2026-10-27T21:42:46Z",
+    "checked_at": "2026-10-27T22:24:15Z",
     "how": "Cantina API: kind=public_contest, status=live, end in future"
    },
-   "fetched_at": "2026-10-27T21:42:46Z",
+   "fetched_at": "2026-10-27T22:24:15Z",
    "extra": {
     "company": "Revert Finance",
     "starts": "2026-10-06T18:30:00Z"
