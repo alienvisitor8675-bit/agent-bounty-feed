@@ -68,6 +68,8 @@ const USDLIKE = new Set(["USD", "USDC", "USDT", "PYUSD", "DAI", "USDG"]);
 const MCP_URL = "https://agent-bounty-feed.dailydollar.workers.dev/mcp";
 function earnUsd(i) {
   if (!i) return null;
+  // Shared pools: only a source-stated per-worker amount counts; no assumed equal split (Codex rule, issue #1).
+  if (i.reward_basis === "shared_pool") return (typeof i.per_worker_usd === "number" && Number.isFinite(i.per_worker_usd)) ? i.per_worker_usd : null;
   if (typeof i.est_usd === "number") return Number.isFinite(i.est_usd) ? i.est_usd : null;
   if (i.est_usd != null) return null; // malformed est_usd: unknown, not zero, not raw reward
   if (typeof i.reward === "number" && Number.isFinite(i.reward) && USDLIKE.has(String(i.currency || "").toUpperCase())) return i.reward;
@@ -99,7 +101,7 @@ function earnNow(feed, now = Date.now()) {
   const gen = Date.parse(feed.generated_at || "");
   return { name: "Agent Bounty Feed — earn now", generated_at: feed.generated_at, feed_age_minutes: Number.isNaN(gen) ? null : Math.round((now - gen) / 60000), mcp: MCP_URL, feed: UPSTREAM,
     install: { claude: "claude mcp add --transport http agent-bounty-feed " + MCP_URL, cursor: { mcpServers: { "agent-bounty-feed": { url: MCP_URL } } } },
-    filter: "kind=bounty, known est_usd>=1 (USD-like currencies only), excludes requires kyc/stake/bond/purchase/human_only, excludes stale items, past deadlines and anything not verified in the last 6 h; sorted by est_usd desc; top 15. Always confirm terms on the source board.",
+    filter: "kind=bounty, known est_usd>=1 (USD-like currencies only; shared pools count only a source-stated per-worker amount), excludes requires kyc/stake/bond/purchase/human_only, excludes stale items, past deadlines and anything not verified in the last 6 h; sorted by est_usd desc; top 15. Always confirm terms on the source board.",
     excluded_not_fresh: all.length - fresh.length, count: items.length, items };
 }
 

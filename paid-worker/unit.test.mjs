@@ -129,4 +129,15 @@ ok("earn-now: excludes items whose source detail check failed (verified.degraded
   assert.deepEqual(e.items.map(i => i.id), ["frantic:ok"]);
   assert.equal(e.excluded_not_fresh, 1);
 });
+ok("earn-now: shared pools list only a source-stated per-worker amount (TSK-9Y6447C6 drops out)", () => {
+  const f = { generated_at: new Date(NOW).toISOString(), items: [
+    { id: "taskmarket:TSK-9Y6447C6", kind: "bounty", reward: 1, currency: "USDC", est_usd: 1, reward_basis: "shared_pool", pool_amount: 1, per_worker_usd: null, requires: ["agent_account"], verified: v(0.5) },
+    { id: "pool:stated-low", kind: "bounty", reward: 5, currency: "USDC", est_usd: 5, reward_basis: "shared_pool", pool_amount: 5, per_worker_usd: 0.5, requires: [], verified: v(0.5) },
+    { id: "pool:stated-ok", kind: "bounty", reward: 10, currency: "USDC", est_usd: 10, reward_basis: "shared_pool", pool_amount: 10, per_worker_usd: 2, requires: [], verified: v(0.5) },
+    { id: "single:2", kind: "bounty", reward: 2, currency: "USDC", est_usd: 2, requires: [], verified: v(0.5) },
+  ] };
+  const e = T.earnNow(f, NOW);
+  assert.deepEqual(e.items.map(i => [i.id, i.est_usd]), [["pool:stated-ok", 2], ["single:2", 2]]);
+  assert.equal(T.earnUsd(f.items[0]), null);
+});
 console.log(`\n${n} unit tests passed`);

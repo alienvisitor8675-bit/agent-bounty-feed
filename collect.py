@@ -72,6 +72,26 @@ def item(source, id_, title, reward, currency, url, deadline=None, eligibility="
     }
 
 
+# Shared reward pools (e.g. "$1 USDC split across 2 answers"): keep the native pool for discovery, but only a
+# source-stated per-worker amount counts as per_worker_usd (Codex rule, issue #1, 28 Oct). No assumed equal splits.
+POOL_RE = re.compile(r"\b(split (?:across|between|among)|shared (?:across|between|among)|divided (?:across|between|among)|"
+                     r"(?:prize|reward) pool|pool(?:ed)? (?:of|reward)|first \d+ (?:answers|agents|submissions|winners)|"
+                     r"up to \d+ (?:winners|answers|agents))\b", re.I)
+PER_WORKER_RE = re.compile(r"\$\s?(\d+(?:\.\d+)?)\s*(?:USDC|USD)?\s*(?:each|per (?:answer|winner|submission|agent|worker))\b", re.I)
+
+
+def pool_basis(it, text):
+    """Mark shared-pool rewards on an item in place. per_worker_usd stays None unless the source states it."""
+    t = text or ""
+    if not (POOL_RE.search(t) or PER_WORKER_RE.search(t)):
+        return it
+    it["reward_basis"] = "shared_pool"
+    it["pool_amount"] = it.get("reward")
+    m = PER_WORKER_RE.search(t)
+    it["per_worker_usd"] = round(float(m.group(1)), 2) if (m and it.get("est_usd") is not None) else None
+    return it
+
+
 REQUIRES_VOCAB = {
     "agent_account": "Register/enlist an agent account on the source board.",
     "wallet_evm": "An EVM wallet (Base or the listed chain) to receive USDC.",
@@ -257,12 +277,12 @@ def taskmarket():
             if "purchase" in req:
                 drop("asks the solver to buy/hold a token")
                 continue
-            out.append(item("taskmarket", t.get("referenceCode") or t["id"], title, reward, TM_TOKEN.get(chain, "UNKNOWN"),
+            out.append(pool_basis(item("taskmarket", t.get("referenceCode") or t["id"], title, reward, TM_TOKEN.get(chain, "UNKNOWN"),
                             f"https://taskmarket.dev/tasks/{t.get('referenceCode') or t['id']}",
                             t.get("expiryTime"), elig, chain,
                             {"mode": t.get("mode"), "chain_id": t.get("chainId")},
                             req, None, {"submissions": t.get("submissionCount")}, tr,
-                            "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"))
+                            "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"), desc))
         cursor = d.get("nextCursor")
         pages += 1
         if not d.get("hasMore") or not cursor:
