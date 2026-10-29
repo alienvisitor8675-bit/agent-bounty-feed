@@ -140,4 +140,14 @@ ok("earn-now: shared pools list only a source-stated per-worker amount (TSK-9Y64
   assert.deepEqual(e.items.map(i => [i.id, i.est_usd]), [["pool:stated-ok", 2], ["single:2", 2]]);
   assert.equal(T.earnUsd(f.items[0]), null);
 });
+ok("earn-now: Superteam ranked prize totals are not one payout; raw 0.999 stays below the $1 bar", () => {
+  const f = { generated_at: new Date(NOW).toISOString(), items: [
+    { id: "superteam:raptorx", kind: "bounty", reward: 125, currency: "USDC", est_usd: 125, reward_basis: "ranked_prizes", pool_amount: 125, per_worker_usd: null, requires: ["agent_account"], verified: v(0.5) },
+    { id: "pool:0999", kind: "bounty", reward: 5, currency: "USDC", est_usd: 5, reward_basis: "shared_pool", pool_amount: 5, per_worker_usd: 0.999, requires: [], verified: v(0.5) },
+    { id: "pool:1000", kind: "bounty", reward: 5, currency: "USDC", est_usd: 5, reward_basis: "shared_pool", pool_amount: 5, per_worker_usd: 1.0, requires: [], verified: v(0.5) },
+  ] };
+  const e = T.earnNow(f, NOW);
+  assert.deepEqual(e.items.map(i => i.id), ["pool:1000"]);
+  assert.equal(T.earnUsd(f.items[0]), null);
+});
 console.log(`\n${n} unit tests passed`);

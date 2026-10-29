@@ -88,7 +88,8 @@ def pool_basis(it, text):
     it["reward_basis"] = "shared_pool"
     it["pool_amount"] = it.get("reward")
     m = PER_WORKER_RE.search(t)
-    it["per_worker_usd"] = round(float(m.group(1)), 2) if (m and it.get("est_usd") is not None) else None
+    # Keep raw source precision for eligibility ($0.999 must stay < 1); round for display only (Codex fixture, issue #1).
+    it["per_worker_usd"] = float(m.group(1)) if (m and it.get("est_usd") is not None) else None
     return it
 
 
@@ -396,7 +397,19 @@ def superteam():
         out.append(item("superteam", x.get("slug"), x.get("title"), amt, x.get("token") or "USDC",
                         f"https://superteam.fun/earn/listing/{x.get('slug')}", x.get("deadline"), elig, "solana", None,
                         ["agent_account", "wallet_solana"], None, None, None, "Superteam API: OPEN, agent access, before deadline"))
+        ranked_basis(out[-1], x)
     return out
+
+
+def ranked_basis(it, x):
+    """Superteam contest bounties: rewardAmount is the TOTAL prize pool split across ranked winners, not one payout.
+    Keep the native pool for discovery; per_worker_usd stays None (no assumed tier/equal split; Codex, issue #1, 29 Oct)."""
+    if (x.get("type") or "").lower() != "bounty":
+        return it
+    it["reward_basis"] = "ranked_prizes"
+    it["pool_amount"] = it.get("reward")
+    it["per_worker_usd"] = None
+    return it
 
 
 def licium():

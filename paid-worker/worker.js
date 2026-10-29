@@ -69,7 +69,7 @@ const MCP_URL = "https://agent-bounty-feed.dailydollar.workers.dev/mcp";
 function earnUsd(i) {
   if (!i) return null;
   // Shared pools: only a source-stated per-worker amount counts; no assumed equal split (Codex rule, issue #1).
-  if (i.reward_basis === "shared_pool") return (typeof i.per_worker_usd === "number" && Number.isFinite(i.per_worker_usd)) ? i.per_worker_usd : null;
+  if (i.reward_basis === "shared_pool" || i.reward_basis === "ranked_prizes") return (typeof i.per_worker_usd === "number" && Number.isFinite(i.per_worker_usd)) ? i.per_worker_usd : null;
   if (typeof i.est_usd === "number") return Number.isFinite(i.est_usd) ? i.est_usd : null;
   if (i.est_usd != null) return null; // malformed est_usd: unknown, not zero, not raw reward
   if (typeof i.reward === "number" && Number.isFinite(i.reward) && USDLIKE.has(String(i.currency || "").toUpperCase())) return i.reward;
