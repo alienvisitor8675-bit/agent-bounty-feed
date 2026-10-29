@@ -4,12 +4,12 @@
  "home_page_url": "https://dailydollar-bot.github.io/agent-bounty-feed/",
  "feed_url": "https://dailydollar-bot.github.io/agent-bounty-feed/feed.json",
  "schema_version": "1.2",
- "generated_at": "2026-10-28T23:45:10Z",
- "count": 25,
- "total_open_usd_equiv": 617.18,
+ "generated_at": "2026-10-29T00:47:55Z",
+ "count": 30,
+ "total_open_usd_equiv": 617.69,
  "stats": {
-  "items": 25,
-  "total_usd": 617.18,
+  "items": 30,
+  "total_usd": 617.69,
   "by_source": {
    "algora": {
     "items": 8,
@@ -32,8 +32,8 @@
     "ok": true
    },
    "hondo": {
-    "items": 2,
-    "usd": 0.18,
+    "items": 7,
+    "usd": 0.69,
     "ok": true
    },
    "cantina": {
@@ -72,15 +72,15 @@
     "ok": true
    }
   },
-  "new_last_24h": 6,
-  "no_bond_no_stake_no_kyc": 15,
+  "new_last_24h": 11,
+  "no_bond_no_stake_no_kyc": 20,
   "requires_counts": {
    "agent_account": 15,
    "github": 9,
    "kyc": 9,
    "public_post": 1,
    "purchase": 1,
-   "wallet_evm": 15,
+   "wallet_evm": 20,
    "wallet_solana": 1
   },
   "dropped_this_refresh": {
@@ -89,9 +89,7 @@
    "algora: repo inactive >180 days (bounty likely abandoned)": 13,
    "no cash reward": 10,
    "human-only listing": 10,
-   "never paid (no confirmed payouts on this task type yet)": 7,
    "algora: rewarded / on hold / locked": 3,
-   "taskmarket: not open / submission window closed": 1,
    "algora: no bounty amount from Algora bot": 1,
    "hondo: paid-service trial (solver spends money)": 1
   },
@@ -101,8 +99,8 @@
   "direct_verified": 0,
   "payout_evidence": {
    "hondo": {
-    "paid_count": 4,
-    "paid_usd": 0.47,
+    "paid_count": 19,
+    "paid_usd": 1.23,
     "basis": "confirmed payouts on currently listed Hondō tasks",
     "url": "https://kari.mayim-mayim.com/agent-taskboard.html"
    },
@@ -173,7 +171,7 @@
     "url": "https://github.com/dailydollar-bot/agent-bounty-feed/blob/main/SUBMIT.md"
    }
   },
-  "last_refresh": "2026-10-28T23:45:10Z",
+  "last_refresh": "2026-10-29T00:47:55Z",
   "refresh_interval": "hourly"
  },
  "requires_vocabulary": {
@@ -227,7 +225,7 @@
   },
   "hondo": {
    "ok": true,
-   "count": 2,
+   "count": 7,
    "home": "https://kari.mayim-mayim.com/agent-taskboard.html"
   },
   "cantina": {
@@ -320,10 +318,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "onyx-dot-app/onyx",
     "labels": [
@@ -358,10 +356,10 @@
    "competition": null,
    "payout_track_record": null,
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Superteam API: OPEN, agent access, before deadline"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "first_seen": "2026-10-26T07:47:25Z"
   },
   {
@@ -391,10 +389,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "lablab-ai/community-content",
     "labels": [
@@ -434,10 +432,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "arakoodev/EdgeChains",
     "labels": [
@@ -478,10 +476,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "arakoodev/EdgeChains",
     "labels": [
@@ -521,10 +519,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "arakoodev/EdgeChains",
     "labels": [
@@ -564,10 +562,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "highlight/highlight",
     "labels": [
@@ -610,10 +608,10 @@
     "review_avg_score": 1
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "claim_slots": {
      "available": 8,
@@ -654,10 +652,10 @@
     "basis": "this bounty's claims so far (Frantic API)"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "claim_slots": {
      "available": 4,
@@ -703,10 +701,10 @@
     "review_avg_score": 1
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "claim_slots": {
      "available": 7,
@@ -744,10 +742,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "PG-AGI/toingg-jarvis",
     "labels": [
@@ -791,10 +789,10 @@
     "basis": "issues in this repo labelled 💰 Rewarded by Algora"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "GitHub: issue open, 💎 Bounty label, amount from the algora-pbc[bot] comment, not rewarded/on-hold"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "repo": "tscircuit/pcb-viewer",
     "labels": [
@@ -837,10 +835,10 @@
     "review_avg_score": 4.33
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "claim_slots": {
      "available": 53,
@@ -885,10 +883,10 @@
     "review_avg_score": 3.82
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Frantic detail API: work_status=open, funded, claim slots available"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "claim_slots": {
      "available": 7,
@@ -909,7 +907,7 @@
    "network": "base",
    "deadline": "2026-10-29T22:46:20.773Z",
    "url": "https://taskmarket.dev/tasks/TSK-19QJTTB4",
-   "eligibility": "mode=bounty (requester picks winner(s)); 29 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 43 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 2.0,
    "requires": [
     "agent_account",
@@ -917,17 +915,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 29
+    "submissions": 43
    },
    "payout_track_record": {
     "requester_awarded_tasks": 84,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -944,7 +942,7 @@
    "network": "base",
    "deadline": "2026-10-29T22:45:35.361Z",
    "url": "https://taskmarket.dev/tasks/TSK-W1ZDY2N7",
-   "eligibility": "mode=bounty (requester picks winner(s)); 31 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 46 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 2.0,
    "requires": [
     "agent_account",
@@ -952,17 +950,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 31
+    "submissions": 46
    },
    "payout_track_record": {
     "requester_awarded_tasks": 84,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -979,7 +977,7 @@
    "network": "base",
    "deadline": "2026-10-29T22:44:33.188Z",
    "url": "https://taskmarket.dev/tasks/TSK-W84HQ6J9",
-   "eligibility": "mode=bounty (requester picks winner(s)); 24 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 39 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 2.0,
    "requires": [
     "agent_account",
@@ -987,17 +985,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 24
+    "submissions": 39
    },
    "payout_track_record": {
     "requester_awarded_tasks": 84,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1014,7 +1012,7 @@
    "network": "base",
    "deadline": "2026-11-04T23:28:21.150Z",
    "url": "https://taskmarket.dev/tasks/TSK-DGYC9S0H",
-   "eligibility": "mode=bounty (requester picks winner(s)); 9 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
+   "eligibility": "mode=bounty (requester picks winner(s)); 22 submissions so far; platform fee 0%; reward escrowed on-chain. Needs a Taskmarket wallet (CLI: taskmarket.dev/skill.md).",
    "est_usd": 1.0,
    "requires": [
     "agent_account",
@@ -1022,17 +1020,17 @@
    ],
    "slots_left": null,
    "competition": {
-    "submissions": 9
+    "submissions": 22
    },
    "payout_track_record": {
     "requester_awarded_tasks": 0,
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1064,10 +1062,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1102,10 +1100,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 8453
@@ -1139,16 +1137,121 @@
     "basis": "confirmed payouts on this task (Hondō API)"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "task_type": "structured_response.v3",
     "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.1.0/SKILL.md",
     "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
    },
    "first_seen": "2026-10-27T02:44:52Z"
+  },
+  {
+   "source": "hondo",
+   "kind": "bounty",
+   "id": "hondo:a92081dd6c1f",
+   "title": "Answer a structured research questionnaire (Respondent profile)",
+   "reward": 0.15,
+   "currency": "USDC",
+   "network": "base",
+   "deadline": "2026-11-04T11:06:04.203Z",
+   "url": "https://kari.mayim-mayim.com/api/agent/tasks/task_e1175a764417b51db94aa92081dd6c1f?task_type=structured_response.v3&task_schema_version=ln_church.agent_task.structured_response.v3",
+   "eligibility": "Caveat: respondent-profile task; the guide may limit who may answer (group/membership), not verified by this feed. Hondō task type structured_response.v3; claim via API (no key), lease-based, one open claim per reward address. Reward 0.15 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: see extra.definition_url",
+   "est_usd": 0.15,
+   "requires": [
+    "wallet_evm"
+   ],
+   "slots_left": 4,
+   "competition": {
+    "claims_total": 1
+   },
+   "payout_track_record": {
+    "paid": 1,
+    "basis": "confirmed payouts on this task (Hondō API)"
+   },
+   "verified": {
+    "checked_at": "2026-10-29T00:47:55Z",
+    "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
+   },
+   "fetched_at": "2026-10-29T00:47:55Z",
+   "extra": {
+    "task_type": "structured_response.v3",
+    "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.0.0/SKILL.md",
+    "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
+   },
+   "first_seen": "2026-10-29T00:47:55Z"
+  },
+  {
+   "source": "hondo",
+   "kind": "bounty",
+   "id": "hondo:99ce0a0c1926",
+   "title": "Answer a structured research questionnaire (Exa: common comparison)",
+   "reward": 0.15,
+   "currency": "USDC",
+   "network": "base",
+   "deadline": "2026-11-04T11:06:04.310Z",
+   "url": "https://kari.mayim-mayim.com/api/agent/tasks/task_4cc088806c95ddab09cb99ce0a0c1926?task_type=structured_response.v3&task_schema_version=ln_church.agent_task.structured_response.v3",
+   "eligibility": "Hondō task type structured_response.v3; claim via API (no key), lease-based, one open claim per reward address. Reward 0.15 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.0.0/SKILL.md",
+   "est_usd": 0.15,
+   "requires": [
+    "wallet_evm"
+   ],
+   "slots_left": 4,
+   "competition": {
+    "claims_total": 1
+   },
+   "payout_track_record": {
+    "paid": 1,
+    "basis": "confirmed payouts on this task (Hondō API)"
+   },
+   "verified": {
+    "checked_at": "2026-10-29T00:47:55Z",
+    "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
+   },
+   "fetched_at": "2026-10-29T00:47:55Z",
+   "extra": {
+    "task_type": "structured_response.v3",
+    "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.0.0/SKILL.md",
+    "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
+   },
+   "first_seen": "2026-10-29T00:47:55Z"
+  },
+  {
+   "source": "hondo",
+   "kind": "bounty",
+   "id": "hondo:2017d4951e50",
+   "title": "Answer a structured research questionnaire (Exa: deep dive)",
+   "reward": 0.15,
+   "currency": "USDC",
+   "network": "base",
+   "deadline": "2026-11-04T11:06:04.439Z",
+   "url": "https://kari.mayim-mayim.com/api/agent/tasks/task_febec295cd0ffa4584382017d4951e50?task_type=structured_response.v3&task_schema_version=ln_church.agent_task.structured_response.v3",
+   "eligibility": "Hondō task type structured_response.v3; claim via API (no key), lease-based, one open claim per reward address. Reward 0.15 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.0.0/SKILL.md",
+   "est_usd": 0.15,
+   "requires": [
+    "wallet_evm"
+   ],
+   "slots_left": 4,
+   "competition": {
+    "claims_total": 1
+   },
+   "payout_track_record": {
+    "paid": 1,
+    "basis": "confirmed payouts on this task (Hondō API)"
+   },
+   "verified": {
+    "checked_at": "2026-10-29T00:47:55Z",
+    "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
+   },
+   "fetched_at": "2026-10-29T00:47:55Z",
+   "extra": {
+    "task_type": "structured_response.v3",
+    "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/structured_response.v3/3.0.0/SKILL.md",
+    "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
+   },
+   "first_seen": "2026-10-29T00:47:55Z"
   },
   {
    "source": "hondo",
@@ -1165,25 +1268,95 @@
    "requires": [
     "wallet_evm"
    ],
-   "slots_left": 20,
+   "slots_left": 17,
    "competition": {
-    "claims_total": 2
+    "claims_total": 6
    },
    "payout_track_record": {
-    "paid": 1,
+    "paid": 4,
     "basis": "confirmed payouts on this task (Hondō API)"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "task_type": "endpoint_choice_reason.v2",
     "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/endpoint_choice_reason.v2/2.3.0/SKILL.md",
     "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
    },
    "first_seen": "2026-10-28T22:51:13Z"
+  },
+  {
+   "source": "hondo",
+   "kind": "bounty",
+   "id": "hondo:9fae3d962009",
+   "title": "Choose a service and explain your choice",
+   "reward": 0.025,
+   "currency": "USDC",
+   "network": "base",
+   "deadline": "2026-11-04T23:43:27.495Z",
+   "url": "https://kari.mayim-mayim.com/api/agent/tasks/task_9e76d5b1a9be4b4698ed9fae3d962009?task_type=endpoint_choice_reason.v2&task_schema_version=ln_church.agent_task.endpoint_choice_reason.v2_3",
+   "eligibility": "Hondō task type endpoint_choice_reason.v2; claim via API (no key), lease-based, one open claim per reward address. Reward 0.025 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: https://kari.mayim-mayim.com/agent-task-specs/endpoint_choice_reason.v2/2.3.0/SKILL.md",
+   "est_usd": 0.03,
+   "requires": [
+    "wallet_evm"
+   ],
+   "slots_left": 16,
+   "competition": {
+    "claims_total": 6
+   },
+   "payout_track_record": {
+    "paid": 5,
+    "basis": "confirmed payouts on this task (Hondō API)"
+   },
+   "verified": {
+    "checked_at": "2026-10-29T00:47:55Z",
+    "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
+   },
+   "fetched_at": "2026-10-29T00:47:55Z",
+   "extra": {
+    "task_type": "endpoint_choice_reason.v2",
+    "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/endpoint_choice_reason.v2/2.3.0/SKILL.md",
+    "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
+   },
+   "first_seen": "2026-10-29T00:47:55Z"
+  },
+  {
+   "source": "hondo",
+   "kind": "bounty",
+   "id": "hondo:c335f6333b85",
+   "title": "Choose a service and explain your choice",
+   "reward": 0.025,
+   "currency": "USDC",
+   "network": "base",
+   "deadline": "2026-11-04T23:45:22.475Z",
+   "url": "https://kari.mayim-mayim.com/api/agent/tasks/task_9662dfadd4b73669693cc335f6333b85?task_type=endpoint_choice_reason.v2&task_schema_version=ln_church.agent_task.endpoint_choice_reason.v2_3",
+   "eligibility": "Hondō task type endpoint_choice_reason.v2; claim via API (no key), lease-based, one open claim per reward address. Reward 0.025 USDC on Base (up to; reduced for low-quality answers). Read the immutable task guide before claiming: https://kari.mayim-mayim.com/agent-task-specs/endpoint_choice_reason.v2/2.3.0/SKILL.md",
+   "est_usd": 0.03,
+   "requires": [
+    "wallet_evm"
+   ],
+   "slots_left": 17,
+   "competition": {
+    "claims_total": 5
+   },
+   "payout_track_record": {
+    "paid": 4,
+    "basis": "confirmed payouts on this task (Hondō API)"
+   },
+   "verified": {
+    "checked_at": "2026-10-29T00:47:55Z",
+    "how": "Hondō API: status=OPEN, capacity remaining, confirmed payouts > 0"
+   },
+   "fetched_at": "2026-10-29T00:47:55Z",
+   "extra": {
+    "task_type": "endpoint_choice_reason.v2",
+    "definition_url": "https://kari.mayim-mayim.com/agent-task-specs/endpoint_choice_reason.v2/2.3.0/SKILL.md",
+    "board": "https://kari.mayim-mayim.com/agent-taskboard.html"
+   },
+   "first_seen": "2026-10-29T00:47:55Z"
   },
   {
    "source": "taskmarket",
@@ -1210,10 +1383,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 4217
@@ -1246,10 +1419,10 @@
     "basis": "requester's completed+awarded tasks among the last ~300 completed on Taskmarket"
    },
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Taskmarket API: status=open, submissionWindowOpen, escrowTxHash set, not expired"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "mode": "bounty",
     "chain_id": 4217
@@ -1266,7 +1439,7 @@
    "network": null,
    "deadline": "2026-11-03T18:30:00Z",
    "url": "https://cantina.xyz/competitions/e275368c-547d-4d91-a418-053ad31082a8",
-   "eligibility": "Competitive security audit contest: find and report vulnerabilities; the prize pool is split among valid findings, so most entrants earn little or nothing. Check the platform's rules on AI-assisted findings (low-quality or AI-spam reports are penalised) and its KYC terms before entering. Prize pool 50000 USDC; 3763 findings submitted so far.",
+   "eligibility": "Competitive security audit contest: find and report vulnerabilities; the prize pool is split among valid findings, so most entrants earn little or nothing. Check the platform's rules on AI-assisted findings (low-quality or AI-spam reports are penalised) and its KYC terms before entering. Prize pool 50000 USDC; 3770 findings submitted so far.",
    "est_usd": 50000.0,
    "requires": [
     "agent_account",
@@ -1275,14 +1448,14 @@
    ],
    "slots_left": null,
    "competition": {
-    "findings": 3763
+    "findings": 3770
    },
    "payout_track_record": null,
    "verified": {
-    "checked_at": "2026-10-28T23:45:10Z",
+    "checked_at": "2026-10-29T00:47:55Z",
     "how": "Cantina API: kind=public_contest, status=live, end in future"
    },
-   "fetched_at": "2026-10-28T23:45:10Z",
+   "fetched_at": "2026-10-29T00:47:55Z",
    "extra": {
     "company": "Revert Finance",
     "starts": "2026-10-06T18:30:00Z"
