@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 export PATH=/home/box/node-v22.11.0-linux-x64/bin:$PATH
 URL=https://agent-bounty-feed.dailydollar.workers.dev
-npx -y wrangler@latest deploy </dev/null
+npx -y wrangler@4.40.0 deploy </dev/null
 for n in 1 2 3 4 5 6 7 8 9 10 11 12; do
   code=$(curl -s -o /tmp/abf402.json -w '%{http_code}' "$URL/v1/bounties?min_usd=2" || true)
   [ "$code" = 402 ] && break; sleep 10
